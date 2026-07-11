@@ -1,13 +1,9 @@
-# backend/ai/ai_client.py
-
-import json
 import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
 from prompts import build_prompt
-from schema import AIPlan
 
 load_dotenv()
 
@@ -18,19 +14,13 @@ client = OpenAI(
 
 class AIClient:
 
-    def analyze(self, dataset_profile):
+    def ask(self, profile):
 
-        prompt = build_prompt(dataset_profile)
+        prompt = build_prompt(profile)
 
         response = client.responses.create(
-            model="gpt-4.1",      # Replace later with Gemma
+            model="gpt-4.1-mini",
             input=prompt
         )
 
-        text = response.output_text
-
-        plan = json.loads(text)
-
-        validated = AIPlan.model_validate(plan)
-
-        return validated
+        return response.output_text
