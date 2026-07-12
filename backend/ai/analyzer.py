@@ -1,13 +1,15 @@
 import json
 
 from config import DATASETS_DIR
-from client import AIClient
-from prompt_builder import PromptBuilder
+from ai.client import AIClient
+from ai.prompt_builder import PromptBuilder
 
 class DatasetAnalyzer:
 
     def __init__(self):
-        ...
+        self.client = AIClient()
+        self.prompt_builder = PromptBuilder()
+        
 
     def load_profile(self, profile_path):
         """
@@ -27,20 +29,28 @@ class DatasetAnalyzer:
 
 
     def analyze(self, profile_path):
-        ...
 
+        profile = self.load_profile(profile_path)
+
+        prompt = self.prompt_builder.build_prompt(profile)
+
+        response = self._call_ai(prompt)
+
+        return response
+    
     def _call_ai(self, prompt):
-        ...
+
+        return self.client.analyze(prompt)
 
     def _validate(self, response):
         ...
 
-if __name__ == "__main__":
+def analyze(self, profile_path):
 
-    analyzer = DatasetAnalyzer()
+    profile = self.load_profile(profile_path)
 
-    profile = analyzer.load_profile(
-        DATASETS_DIR / "profile.json"
-    )
+    prompt = self.prompt_builder.build_prompt(profile)
 
-    print(type(profile))
+    response = self._call_ai(prompt)
+
+    return response
