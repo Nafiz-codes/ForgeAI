@@ -402,7 +402,6 @@ async def download_csv(dataset_id: str):
         path=str(path),
         media_type="text/csv",
         filename=filename,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
