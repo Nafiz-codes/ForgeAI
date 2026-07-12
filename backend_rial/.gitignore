@@ -1,0 +1,8 @@
+# ForgeAI backend_rial — sessions are local disk storage (not committed to git)
+sessions/
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+.venv/
+venv/
