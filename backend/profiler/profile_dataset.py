@@ -61,7 +61,8 @@ class DatasetProfiler:
             "memory_usage_mb": round(
                 self.df.memory_usage(deep=True).sum() / (1024 ** 2),
                 2
-            )
+            ),
+            "health_score": self._dataset_health()
         }
     
     def _column_profiles(self):
@@ -71,33 +72,33 @@ class DatasetProfiler:
         for column in self.df.columns:
 
             series = self.df[column]
-
+            semantic_type = self._semantic_type(column, series)
+            missing_percent = round(
+                series.isna().mean() * 100,
+                2
+            )
             column_profile = {
                 "name": column,
                 "dtype": str(series.dtype),
+                "semantic_type": semantic_type,
                 "missing_count": int(series.isna().sum()),
-                "missing_percent": round(
-                    series.isna().mean() * 100,
-                    2
-                ),
+                "missing_percent": missing_percent,
+                "risk": self._risk_level(missing_percent),
+                "constant": self._is_constant(series),
                 "unique_values": int(series.nunique()),
-                "possible_identifier": bool(
-                    series.nunique() == len(self.df)
-                )
+                "possible_identifier": semantic_type == "identifier"
             }
-
-            if pd.api.types.is_numeric_dtype(series):
+            if semantic_type == "numeric":
                 column_profile.update(
                     self._numeric_profile(series)
                 )
-
-            elif pd.api.types.is_object_dtype(series):
+            elif semantic_type in ["categorical", "text"]:
                 column_profile.update(
                     self._categorical_profile(series)
                 )
 
             profiles.append(column_profile)
-
+        print(column, series.dtype)
         return profiles
     
     def _numeric_profile(self, series):
@@ -132,7 +133,79 @@ class DatasetProfiler:
             "top_values": values.index.astype(str).tolist(),
             "top_counts": values.values.tolist()
         }
+    
+    def _semantic_type(self, column_name, series):
 
+        name = column_name.lower()
+
+        if (
+            "id" in name
+            or name.endswith("_id")
+            or series.nunique() == len(self.df)
+        ):
+            return "identifier"
+
+        if pd.api.types.is_bool_dtype(series):
+            return "boolean"
+
+        if pd.api.types.is_datetime64_any_dtype(series):
+            return "datetime"
+
+        if pd.api.types.is_numeric_dtype(series):
+            return "numeric"
+
+        if (
+            pd.api.types.is_object_dtype(series)
+            or pd.api.types.is_string_dtype(series)
+        ):
+            uniqueness_ratio = (
+                series.nunique(dropna=True)
+                / max(len(series), 1)
+            )
+            if uniqueness_ratio > 0.5:
+                return "text"
+            return "categorical"
+
+        return "unknown"
+    
+    def _risk_level(self, missing_percent):
+
+        if missing_percent <= 5:
+            return "Low"
+
+        elif missing_percent <= 20:
+            return "Medium"
+
+        return "High"
+    
+    def _is_constant(self, series):
+
+        return series.nunique(dropna=False) <= 1
+
+    def _dataset_health(self):
+
+        score = 100
+
+        duplicate_rows = self.df.duplicated().sum()
+
+        score -= duplicate_rows * 2
+
+        for column in self.df.columns:
+
+            series = self.df[column]
+
+            missing = series.isna().mean() * 100
+
+            if missing > 20:
+                score -= 5
+
+            if self._is_constant(series):
+                score -= 3
+
+            if self._semantic_type(column, series) == "identifier":
+                score -= 1
+
+        return max(score, 0)
 if __name__ == "__main__":
 
     BASE_DIR = Path(__file__).resolve().parent.parent
