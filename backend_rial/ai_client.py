@@ -154,7 +154,10 @@ def parse_and_validate(raw_text: str) -> dict:
 
 def _call_openai(prompt: str) -> str:
     from openai import OpenAI
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    client = OpenAI(
+        api_key=os.environ["OPENAI_API_KEY"],
+        base_url=os.getenv("OPENAI_BASE_URL")  # Support OpenRouter
+    )
     response = client.chat.completions.create(
         model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
         messages=[

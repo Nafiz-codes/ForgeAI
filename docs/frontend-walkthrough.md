@@ -2,7 +2,7 @@
 
 > **Owner:** Member 3 — Frontend Engineer  
 > **Stack:** Next.js 16 · TypeScript · Tailwind CSS · Vanilla CSS Design System  
-> **Last updated:** July 12, 2026
+> **Last updated:** July 13, 2026
 
 ---
 
@@ -17,182 +17,157 @@ npm run dev
 
 ---
 
-## Pages Overview
+## Design Philosophy (July 2026 Redesign)
 
-### 🏠 Landing Page — `/`
+The original frontend used a heavy glassmorphism template aesthetic — every section had stacked glass cards, gradient text everywhere, emoji in buttons and headings, and copy that read like generated marketing text.
 
-**File:** `frontend/src/app/page.tsx`
+The redesign moved toward an editorial, product-first aesthetic inspired by tools like Linear, Vercel, and Liveblocks. Key decisions:
 
-The marketing homepage. Everything here is static — no API calls.
+### Visual changes
+- **Emoji removed from UI controls** — no emoji in buttons, tabs, section headings, or badges. Icons that communicate status use SVG or unicode text (`✓`, `✗`) only in appropriate toggle contexts.
+- **Logo replaced** — the `⚡` emoji logo was replaced with a small SVG checkmark-in-rounded-rect, used consistently across all pages.
+- **Glass used sparingly** — glassmorphism now only appears on sticky navbars and the floating confirmation bar on the review page. Regular content cards use `background: var(--bg-card)` with a simple border.
+- **Feature card grid** — replaced individual glassmorphism cards with a CSS grid separated by 1px lines (like Linear's feature section), which reads as a unified table rather than isolated tiles.
+- **Stat grid on upload page** — same 1px-separator grid pattern instead of individual stat cards.
+- **Orb blobs** — kept but reduced opacity from 0.35 to 0.22; used only in hero and CTA sections.
+- **Color palette tightened** — accent colors slightly adjusted to feel less saturated. `--accent-blue` is now `#2563eb` (used in buttons) while `#3b82f6` is reserved for informational highlights.
+- **Buttons** — `btn-primary` is now a flat `#2563eb` (not a gradient), which looks less like a template and more like a real product button. Hover darkens to `#1d4ed8` with a soft shadow. No `::before` overlay trick.
 
-| Section | Description |
-|---|---|
-| `<NavBar>` | Sticky glassmorphism nav, scrolled state changes background |
-| `<HeroSection>` | Animated typewriter tagline, gradient headline, background orbs, stats row |
-| `<FeaturesSection>` | 6 glassmorphism cards covering the product pillars |
-| `<HowItWorksSection>` | 4-step pipeline: Upload → Profile → Review → Download |
-| `<DemoSection>` | **Interactive** — live toggleable AI decision cards (✓/✗), no API |
-| `<CTASection>` | Full-width call-to-action with glow effect |
-| `<Footer>` | Links to all pages |
+### Copy changes
+- **Hero headline** — "Your data, AI-cleaned. ML-ready in seconds." → "Your messy data, cleaned by AI. ML-ready in under a minute." (more specific, honest)
+- **Sub-heading** — removed "doesn't just clean data" phrasing. Replaced with a direct description of what actually happens.
+- **Feature descriptions** — each card rewritten to explain the *mechanism*, not the value proposition. E.g., "Gemma reads your dataset profile and reasons about it — the same way a senior data scientist would" instead of "ForgeAI doesn't just run heuristics — Gemma reads your dataset profile and reasons like a senior data scientist, justifying every decision."
+- **How it works steps** — same: descriptions now say what Gemma actually does, not how impressive it is.
+- **Demo section** — "See the AI Plan Review — live" → "This is what the review step looks like." More honest, less promotional.
+- **CTA** — "Ready to forge your perfect dataset?" → "Stop cleaning data by hand." Simpler, problem-focused.
+- **Button text** — "🚀 Start Analyzing" → "Start analyzing", "🚀 Launch ForgeAI" → "Upload a dataset", "✅ Approve & Execute" → "Execute plan", "⬇️ Download Clean CSV" → "Download clean CSV".
+- **Decision log tab** — "📋 AI Decision Log" → "Decision log".
+- **ML model descriptions** — rewritten to be analytical rather than enthusiastic. E.g., "Worth training alongside Random Forest" instead of "Excellent for tabular data."
+- **Review page Gemma banner** — "I identified..." rewritten as third-person statement without the emoji, reads more like a system message.
+
+### Layout changes
+- **Stats row** in hero section — changed from emoji+value cards to a three-column bordered layout with clear metric/label pairs, no emoji.
+- **How It Works** — connector lines removed (were already hidden), step numbers now use low-opacity color fills instead of being nested inside separate icon boxes, cleaner visual hierarchy.
+- **Navigation breadcrumb** — `StepIndicator` extracted into a shared component, consistent across all three inner pages. Step dots: pending → `rgba(255,255,255,0.05)`, active → `#2563eb`, done → `#059669`.
+- **Demo section** — the panel now has an explicit header row (filename, approval count, "Open full review" link) to look like an actual product UI rather than a marketing mock.
+- **Results tabs** — tab bar uses a slightly smaller radius and border, text labels without emoji.
+- **Download items** — SVG download icons replace the `⬇️` emoji. Each item has a color-tinted icon square.
+
+### CSS changes (`globals.css`)
+- Removed `grid-bg` animated grid (was too heavy, now only used on hero).
+- Removed `.noise` pseudo-element (was barely visible, added complexity).
+- Added `--bg-surface`, `--border-subtle`, `--border-strong`, `--text-dimmed` tokens for finer control.
+- Added `.section-label` utility (small-caps uppercase label above section headings).
+- Refined `.data-table` — headers are now muted uppercase labels, not blue. First column defaults to `--text-primary`.
+- Reduced `@keyframes` to only those actually used.
+- `btn-primary` is now a solid blue, not a gradient. `btn-secondary` has a more neutral background.
+- `.card` class added as a simpler alternative to `.glass` for non-sticky contexts.
+- Orb opacity reduced from `0.35` → `0.22`.
+- `--radius-sm/md/lg/xl` tokens added for consistent border-radius.
 
 ---
 
-### 📁 Upload Page — `/upload`
+## Pages Overview
+
+### Landing Page — `/`
+
+**File:** `frontend/src/app/page.tsx`
+
+The marketing homepage. Static — no API calls.
+
+| Section | Description |
+|---|---|
+| `<NavBar>` | Sticky nav, background appears on scroll. SVG logo. No emoji in links. |
+| `<HeroSection>` | Typewriter second line, orb blobs, three-column metrics row (no emoji) |
+| `<FeaturesSection>` | 6 feature cells in a 1px-separator grid, `section-label` above heading |
+| `<HowItWorksSection>` | 4-step grid, accent top-border per step, big muted step numbers |
+| `<DemoSection>` | Interactive decision cards panel, looks like actual product UI |
+| `<CTASection>` | Centered, single CTA button, no secondary button |
+| `<Footer>` | Three-column layout, small SVG logo, minimal links |
+
+---
+
+### Upload Page — `/upload`
 
 **File:** `frontend/src/app/upload/page.tsx`
 
-The entry point for users. Currently uses simulated data — needs wiring to the backend profiler.
-
-**Current flow (mock):**
-```
-Drop CSV → fake upload progress bar → fake "Gemma profiling" spinner → hardcoded profile stats
-```
-
-**Real flow (once backend is ready):**
-```
-Drop CSV → POST /api/upload → returns dataset_profile.json → render real stats
-```
+Entry point for users. Simulated upload/profiling flow.
 
 **Key UI states:**
 | State | What renders |
 |---|---|
-| `idle` | Drag-and-drop zone + sample dataset buttons |
-| `uploading` | Progress bar (0–100%) |
-| `profiling` | Spinning brain icon + badge labels |
-| `done` | Stats grid + data preview table + column analysis |
+| `idle` | Upload zone (SVG icon, no emoji), sample dataset text buttons |
+| `uploading` | Progress bar with text percentage |
+| `profiling` | CSS spinner ring + analysis badge labels |
+| `done` | 1px-separator stats grid + data preview table + column analysis |
 
-**Hardcoded data to replace:**
-- `PROFILE_STATS` → real values from backend profiler
-- `COLUMN_ANALYSIS` → real column metadata from Pandas
-- `SAMPLE_DATA` → first 5 rows from the actual uploaded CSV
+**Stat grid design:** Uses `gap: "1px"` background as separators instead of individual cards — unified block that reads as a summary panel.
 
-**API contract expected from Backend (M2):**
-```json
-POST /api/upload
-Content-Type: multipart/form-data
+**Column analysis flags:** Removed emoji from flag badges (`⚠️ Identifier` → `Identifier`, `🔴 Has Nulls` → `Has nulls`).
 
-Response 200:
-{
-  "dataset_id": "abc123",
-  "rows": 7841,
-  "columns": 12,
-  "missing_total": 1203,
-  "duplicate_rows": 47,
-  "health_score": 42,
-  "target_column": "Churn",
-  "preview": [ { "col": "val", ... } ],
-  "column_analysis": [
-    { "name": "Age", "type": "float64", "missing_pct": 14.2, "unique_count": 68, "flag": "Has Nulls" }
-  ]
-}
-```
+**Upload zone:** The folder icon (📂) replaced with an SVG upload arrow in a tinted box. "Browse Files" button removed from inside the zone; instead the entire zone is clickable with a "Choose file" secondary button.
+
+**Sample dataset buttons:** Changed from blue tinted pill buttons to neutral bordered buttons matching the site's secondary style.
 
 ---
 
-### 🧠 AI Plan Review Page — `/review`
+### AI Plan Review Page — `/review`
 
 **File:** `frontend/src/app/review/page.tsx`
 
-The **key differentiator** of ForgeAI. Every proposed action from Gemma is shown as an interactive card. Users approve or override before a single row is touched.
+The core interactive page. Users approve or skip preprocessing actions.
 
-**Current flow (mock):**
-```
-Hardcoded INITIAL_DECISIONS array → user toggles cards → "Execute" transitions to /results
-```
+**Decision card changes:**
+- Left accent line reduced from `3px` to `2px`
+- Toggle button is `36px` (was `40px`), uses `✓` / `✗` text, not emoji
+- Category labels on each card have no emoji prefix
+- Skipped cards dim to `opacity: 0.55` (was `0.65`)
+- Action tag uses `font-weight: 500` (not bold), reads more like metadata
 
-**Real flow (once AI + backend is ready):**
-```
-GET /api/plan/{dataset_id} → Gemma's decisions → user edits → POST /api/execute
-```
+**Category filter:** Plain text buttons with border + background tint on active state, no emoji. "All Actions" → "All".
 
-**Decision card fields:**
-| Field | Source | Description |
-|---|---|---|
-| `column` | Gemma JSON | Column name being acted on |
-| `action` | Gemma JSON | What will be done (e.g. "Median imputation") |
-| `category` | Gemma JSON | Groups actions (Missing Value Handling, etc.) |
-| `reason` | Gemma JSON | Gemma's human-readable explanation |
-| `confidence` | Gemma JSON | 0–100 confidence score |
-| `status` | Frontend state | `keep` or `remove` — set by user toggle |
+**Page header copy:** "Gemma analyzed customer_churn.csv and proposed 8 actions" — plain, honest.
 
-**Hardcoded data to replace:**
-- `INITIAL_DECISIONS` array → fetch from `GET /api/plan/{dataset_id}`
+**Gemma analysis banner:** Replaced the brain emoji + "Gemma 4 Analysis Complete" header with a small dot indicator and a plain paragraph.
 
-**API contracts:**
-```json
-GET /api/plan/{dataset_id}
-Response 200:
-{
-  "dataset_health_score": 42,
-  "predicted_health_score": 93,
-  "summary": "Gemma's overall analysis summary...",
-  "actions": [
-    {
-      "column": "CustomerID",
-      "action": "Drop column",
-      "category": "Identifier Removal",
-      "reason": "Cardinality equals row count (100%)...",
-      "confidence": 97,
-      "type": "drop"
-    }
-  ]
-}
+**Bottom bar:** "✅ Execute Plan" → "Execute plan", "← Re-upload" → "Back to upload".
 
-POST /api/execute
-Body: { "dataset_id": "abc123", "approved_actions": [ ...kept actions... ] }
-Response 200: { "job_id": "xyz789" }
-```
+**Completion screen:** The `🎉` emoji replaced with a checkmark in a green-tinted box. Text: "Plan executed" instead of "Plan executed!".
+
+**Execute button in nav:** "✅ Approve & Execute (8)" → "Execute (8 actions)".
 
 ---
 
-### 📊 Results Page — `/results`
+### Results Page — `/results`
 
 **File:** `frontend/src/app/results/page.tsx`
 
-Shows the outcome of the executed preprocessing plan. Four tabbed sections.
+Shows the outcome of the executed preprocessing plan.
 
-| Tab | Content |
-|---|---|
-| **Overview** | Health score SVG rings (before/after), Before/After comparison table, Download artifact buttons |
-| **AI Decision Log** | Audit table of all 8 executed actions with timing |
-| **Pipeline Code** | Generated `preprocessing_pipeline.py` with copy-to-clipboard |
-| **ML Models** | Gemma's ranked model recommendations with suitability scores |
+**Tab labels:** All emoji removed: `"📊 Overview"` → `"Overview"`, `"📋 AI Decision Log"` → `"Decision log"`, `"⚙️ Pipeline Code"` → `"Pipeline code"`, `"🎯 ML Models"` → `"Model suggestions"`.
 
-**Health score rings** are rendered as raw SVG — no chart library needed.
+**Success banner:** `🎉` removed. `h1` is now `<code>filename</code> is ML-ready` — inline code element gives it a technical feel without emoji.
 
-**Hardcoded data to replace:**
-- `ML_MODELS` → from Gemma's `ml_recommendations` field
-- `DECISION_LOG` → from backend execution log
-- `BEFORE_AFTER` → computed from before/after dataset stats
-- `PIPELINE_CODE` → fetched as text from `GET /api/artifacts/{dataset_id}/pipeline`
+**Download buttons:** `"⬇️ Download Clean CSV"` → `"Download clean CSV"` / `"Download pipeline"`.
 
-**API contracts:**
-```json
-GET /api/results/{dataset_id}
-Response 200:
-{
-  "health_score_before": 42,
-  "health_score_after": 93,
-  "completeness_score": 97,
-  "consistency_score": 89,
-  "ml_readiness_score": 94,
-  "actions_applied": 8,
-  "rows_after": 7794,
-  "columns_after": 14,
-  "decision_log": [ { "action": "...", "reason": "...", "time_ms": 23 } ],
-  "ml_recommendations": [ { "model": "Random Forest", "suitability": 94, "reason": "..." } ]
-}
+**Health rings:** `HealthRing` component unchanged in logic; label text cleaned up (`"Before Score"` → `"Before"`, etc.).
 
-GET /api/artifacts/{dataset_id}/csv         → clean CSV file download
-GET /api/artifacts/{dataset_id}/pipeline    → preprocessing_pipeline.py text
-GET /api/artifacts/{dataset_id}/report      → HTML report file
-```
+**Decision log table:** Status column (`✅`) removed — success is implied. Table now has four columns: Action, Reason, Impact, Time.
+
+**ML Models tab:** 
+- `🌲`, `⚡`, `📈` icon emojis replaced with ranked number badges (1, 2, 3) in color-tinted boxes.
+- Model descriptions rewritten to be analytical.
+- Gemma recommendation note: `"🧠 Gemma recommends"` → `"Gemma recommends"` (no emoji).
+
+**Download items:** `📄`, `⚙️`, `📊` icons replaced with inline SVG download arrows in color-tinted squares.
+
+**Copy button:** `"✓ Copied!"` → `"Copied"`, `"Copy Code"` → `"Copy"`.
 
 ---
 
 ## Design System
 
-All design tokens, animations, glassmorphism utilities, badge variants, and component styles live in one file:
+All tokens, utilities, and component styles are in:
 
 **File:** `frontend/src/app/globals.css`
 
@@ -200,41 +175,54 @@ All design tokens, animations, glassmorphism utilities, badge variants, and comp
 
 | Variable | Value | Usage |
 |---|---|---|
-| `--bg-primary` | `#030712` | Page background |
-| `--bg-card` | `#0d1424` | Card backgrounds |
-| `--accent-blue` | `#3b82f6` | Primary actions |
-| `--accent-violet` | `#8b5cf6` | AI/Gemma elements |
-| `--accent-emerald` | `#10b981` | Success / "after" states |
-| `--accent-rose` | `#f43f5e` | Danger / "before" states |
-| `--accent-amber` | `#f59e0b` | Warnings / Medium confidence |
-| `--text-secondary` | `#94a3b8` | Body copy |
-| `--text-muted` | `#475569` | Labels, metadata |
+| `--bg-primary` | `#080c14` | Page background |
+| `--bg-secondary` | `#0c1120` | Nav, table headers, panel headers |
+| `--bg-card` | `#0f1524` | Card backgrounds |
+| `--bg-card-hover` | `#131a2c` | Card hover state |
+| `--bg-surface` | `#111827` | Surfaces needing slightly more contrast |
+| `--border` | `rgba(255,255,255,0.07)` | Standard borders |
+| `--border-subtle` | `rgba(255,255,255,0.04)` | 1px separator lines |
+| `--border-strong` | `rgba(255,255,255,0.14)` | Focused/active borders |
+| `--accent-blue` | `#2563eb` | Primary button background |
+| `--accent-violet` | `#7c3aed` | AI/Gemma elements |
+| `--accent-emerald` | `#059669` | Success / "after" states |
+| `--accent-rose` | `#e11d48` | Danger / "before" states |
+| `--accent-amber` | `#d97706` | Warnings / Medium confidence |
+| `--text-primary` | `#f8fafc` | Main text |
+| `--text-secondary` | `#8b9ab0` | Body copy |
+| `--text-muted` | `#4b5d73` | Labels, metadata |
+| `--text-dimmed` | `#2d3f55` | Very faint hints |
 
 ### Utility Classes
 
 | Class | Effect |
 |---|---|
-| `.glass` | Glassmorphism card (blur + dark bg + subtle border) |
-| `.glass-bright` | Higher opacity glass for focal elements |
+| `.card` | Simple dark card (bg-card + border), no blur |
+| `.glass` | Glassmorphism — used only for sticky navbars |
+| `.glass-bright` | Higher opacity glass for floating bars |
 | `.gradient-text` | Blue→Violet→Emerald gradient text |
-| `.btn-primary` | Blue→Violet gradient button with hover lift |
-| `.btn-secondary` | Transparent button with border |
+| `.section-label` | Small-caps uppercase label above headings |
+| `.btn-primary` | Solid blue button with hover darken |
+| `.btn-secondary` | Neutral bordered button |
 | `.badge` + `.badge-{color}` | Pill badges (blue, violet, emerald, amber, rose, cyan) |
-| `.card-hover` | Lift + border brighten on hover |
-| `.orb` | Blurred background blob for atmosphere |
-| `.data-table` | Dark-themed HTML table |
-| `.progress-bar` + `.progress-fill` | Thin progress bar |
+| `.card-hover` | Border brighten + translateY(-2px) on hover |
+| `.orb` | Blurred background blob (opacity 0.22) |
+| `.data-table` | Clean dark table, uppercase muted headers |
+| `.progress-bar` + `.progress-fill` | 4px progress bar |
 | `.confidence-high/medium/low` | Gradient fills for confidence bars |
+| `.upload-zone` | Dashed border drop zone |
+| `.grid-bg` | Subtle 48px grid pattern |
 
 ### Animations
 
 | Class | Effect |
 |---|---|
-| `.animate-float` | Gentle vertical bob (4s loop) |
-| `.animate-spin-slow` | Slow full rotation (12s loop) |
-| `.animate-fadeInUp` | Fade in from below (one-shot) |
-| `.animate-shimmer` | Shimmer sweep across element |
-| `.thinking-dot` | AI thinking pulse dots |
+| `.animate-fadeInUp` | Fade in from below (0.5s) |
+| `.animate-fadeIn` | Simple fade in (0.4s) |
+| `.animate-float` | Gentle vertical bob (3.5s loop) |
+| `.animate-spin-slow` | Used for profiling spinner (1s) |
+| `.animate-slideInRight` | Slide in from right (toast) |
+| `.thinking-dot` | Pulsing AI dots |
 
 ---
 
@@ -274,7 +262,6 @@ These are the tasks remaining before the frontend is fully wired to real AI:
 - [ ] **M3 Frontend** — Pass `dataset_id` between pages (via URL params or context)
 - [ ] **M3 Frontend** — Handle API error states (invalid CSV, Gemma timeout, etc.)
 - [ ] **M3 Frontend** — Mobile responsive breakpoints
-- [ ] **M3 Frontend** — Framer Motion page transitions (polish day)
 
 ---
 
@@ -282,6 +269,6 @@ These are the tasks remaining before the frontend is fully wired to real AI:
 
 | Role | Responsibility |
 |---|---|
-| 🧠 M1 — AI Engineer | Gemma 4 prompt, JSON schema, confidence scoring |
-| ⚙️ M2 — Backend Engineer | FastAPI, Pandas profiler, sklearn execution, file generation |
-| 🎨 M3 — Frontend Engineer | This file — all pages at `http://localhost:3000` |
+| M1 — AI Engineer | Gemma 4 prompt, JSON schema, confidence scoring |
+| M2 — Backend Engineer | FastAPI, Pandas profiler, sklearn execution, file generation |
+| M3 — Frontend Engineer | This file — all pages at `http://localhost:3000` |
