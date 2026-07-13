@@ -1,86 +1,35 @@
 """
 ForgeAI Backend — AI Client (Layer 2)
-Owner: Member 1 (AI Engineer) — integration glue written by M2
+Owner: Member 2 (Backend Engineer) — integration glue
 
-Wraps the AI engineer's prompt builder with robust JSON parsing
-and schema validation. Supports both OpenAI and Google Gemma
-backends via environment-variable config.
+Delegates prompt building and model calls to the AI Engineer's modules
+in backend_ai/ai/. The backend engineer owns:
+  - JSON parsing and extraction from raw model responses
+  - Schema validation and normalisation
+  - The public get_ai_plan() interface called by main.py
 """
 
 import json
-import os
 import re
 import logging
+import sys
 from pathlib import Path
+
+# ── Make the AI Engineer's module importable ──────────────────
+# Add the parent 'backend_ai' directory to sys.path so we can import
+# from backend_ai/ai/ without modifying the AI engineer's code.
+_BACKEND_AI_DIR = Path(__file__).resolve().parent.parent / "backend_ai"
+if str(_BACKEND_AI_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_AI_DIR))
+
+from ai.client import AIClient
+from ai.prompt_builder import PromptBuilder
 
 logger = logging.getLogger(__name__)
 
-# ─────────────────────────────────────────────────────────────
-# Prompt builder (reproduces the template from backend-walkthrough.md)
-# ─────────────────────────────────────────────────────────────
-
-PROMPT_TEMPLATE = """You are an expert data scientist. You have been given a structured profile
-of a dataset. Your job is to propose a preprocessing plan.
-
-## Dataset Profile
-{profile_json}
-
-## Instructions
-Analyze every column and propose exactly one action per column that needs attention.
-Follow these rules:
-- If a column's unique_count equals the row count, it is an identifier — recommend dropping it.
-- If missing_pct > 5% and dtype is numeric, recommend median imputation if |skewness| > 1, else mean imputation.
-- If missing_pct > 0% and dtype is categorical, recommend mode imputation.
-- If |skewness| > 2, recommend log transform before scaling.
-- If dtype is categorical with Low cardinality (<= 10 unique), recommend one-hot encoding.
-- If dtype is categorical with Medium/High cardinality (> 10 unique), recommend label encoding.
-- If outlier_count > 10, recommend IQR winsorization.
-- If duplicates > 0, always include deduplication as the FIRST action (column = "Dataset").
-- Any column with "id", "key", "number", "phone", "email" in its name is likely PII — flag it.
-- Assign a confidence score (0–100) to every decision.
-- Write your reason in plain English, referencing the actual statistics from the profile.
-- Do NOT recommend actions for columns that look clean with no issues.
-
-## Output Format
-Respond ONLY with valid JSON. No explanation outside the JSON block.
-
-{{
-  "summary": "...",
-  "predicted_health_score": <integer 0-100>,
-  "actions": [
-    {{
-      "column": "<column_name or Dataset for global actions>",
-      "action": "<action_label>",
-      "category": "<category>",
-      "reason": "<plain English explanation referencing actual stats>",
-      "confidence": <0-100>,
-      "type": "<drop|impute|transform|encode|outlier|dedup|scale>"
-    }}
-  ],
-  "ml_recommendations": [
-    {{
-      "model": "<model_name>",
-      "type": "<model_type>",
-      "suitability": <0-100>,
-      "reason": "<explanation>",
-      "pros": ["...", "..."]
-    }}
-  ]
-}}
-
-Valid type values: drop, impute, transform, encode, outlier, dedup, scale
-Valid category values: Identifier Removal, PII Removal, Missing Value Handling,
-  Feature Engineering, Categorical Encoding, Outlier Treatment, Data Quality, Feature Scaling
-"""
-
-
-def build_prompt(profile: dict) -> str:
-    profile_json = json.dumps(profile, indent=2, default=str)
-    return PROMPT_TEMPLATE.format(profile_json=profile_json)
-
 
 # ─────────────────────────────────────────────────────────────
-# Response parser & validator
+# Response parser & validator (Backend Engineer's responsibility)
 # ─────────────────────────────────────────────────────────────
 
 VALID_TYPES = {"drop", "impute", "transform", "encode", "outlier", "dedup", "scale"}
@@ -105,7 +54,7 @@ def _strip_fences(text: str) -> str:
 
 def parse_and_validate(raw_text: str) -> dict:
     """
-    Parse Gemma/OpenAI raw text → validated preprocessing plan dict.
+    Parse raw model text → validated preprocessing plan dict.
     Raises ValueError on parse/validation failure.
     """
     text = _strip_fences(raw_text)
@@ -149,57 +98,30 @@ def parse_and_validate(raw_text: str) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
-# AI backend — pluggable (OpenAI or Google Gemini)
+# Public interface — called by main.py
 # ─────────────────────────────────────────────────────────────
-
-def _call_openai(prompt: str) -> str:
-    from openai import OpenAI
-    client = OpenAI(
-        api_key=os.environ["OPENAI_API_KEY"],
-        base_url=os.getenv("OPENAI_BASE_URL")  # Support OpenRouter
-    )
-    response = client.chat.completions.create(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        messages=[
-            {"role": "system", "content": "You are an expert data scientist. Respond only with valid JSON."},
-            {"role": "user",   "content": prompt},
-        ],
-        temperature=0.1,
-        max_tokens=4096,
-    )
-    return response.choices[0].message.content or ""
-
-
-def _call_gemini(prompt: str) -> str:
-    import google.generativeai as genai
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemma-3-27b-it"))
-    response = model.generate_content(prompt)
-    return response.text or ""
-
 
 def get_ai_plan(profile: dict) -> dict:
     """
-    Send the dataset profile to the configured AI backend and return
+    Send the dataset profile to the AI Engineer's model client and return
     a validated preprocessing plan dict.
 
-    Environment variables:
-      AI_BACKEND      = "openai" (default) | "gemini"
-      OPENAI_API_KEY  — required for openai backend
-      OPENAI_MODEL    — defaults to gpt-4o-mini
-      GEMINI_API_KEY  — required for gemini backend
-      GEMINI_MODEL    — defaults to gemma-3-27b-it
+    Delegates to:
+      - PromptBuilder.build_prompt()  (AI Engineer — backend_ai/ai/prompt_builder.py)
+      - AIClient.analyze()            (AI Engineer — backend_ai/ai/client.py)
+    Owns:
+      - parse_and_validate()          (Backend Engineer)
     """
-    prompt = build_prompt(profile)
-    backend = os.getenv("AI_BACKEND", "openai").lower()
-
     try:
-        if backend == "gemini":
-            raw = _call_gemini(prompt)
-        else:
-            raw = _call_openai(prompt)
+        # Build prompt using AI Engineer's PromptBuilder
+        prompt = PromptBuilder().build_prompt(profile)
+
+        # Call the model using AI Engineer's AIClient
+        raw = AIClient().analyze(prompt)
 
         logger.info("AI raw response (first 200 chars): %s", raw[:200])
+
+        # Parse and validate the response (backend engineer's responsibility)
         return parse_and_validate(raw)
 
     except Exception as exc:
