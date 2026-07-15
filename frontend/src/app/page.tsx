@@ -4,89 +4,79 @@ import { useState, useEffect } from "react";
 
 const NAV_LINKS = [
   { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#demo", label: "Demo Flow" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#demo", label: "Try it" },
 ];
 
 const FEATURE_CARDS = [
   {
-    icon: "🧠",
-    title: "Gemma 4 Reasoning",
-    desc: "ForgeAI doesn't just run heuristics — Gemma reads your dataset profile and reasons like a senior data scientist, justifying every decision.",
-    badge: "AI-Powered",
-    badgeClass: "badge-violet",
-    color: "#8b5cf6",
+    title: "Reasoning, not rules",
+    desc: "Gemma reads your dataset profile and reasons about it — the same way a senior data scientist would. It considers skewness, cardinality, null patterns, and outlier distribution before proposing anything.",
+    tag: "AI-Powered",
+    tagClass: "badge-violet",
+    accent: "#7c3aed",
   },
   {
-    icon: "🤝",
-    title: "Human-AI Collaboration",
-    desc: "Review every proposed action before execution. Override recommendations, keep columns Gemma flagged for removal, and stay in full control.",
-    badge: "Interactive",
-    badgeClass: "badge-blue",
-    color: "#3b82f6",
+    title: "You stay in control",
+    desc: "Every proposed action comes with an explanation. Override what you disagree with, keep columns Gemma flagged for removal, and approve only what makes sense. Nothing runs without your sign-off.",
+    tag: "Interactive",
+    tagClass: "badge-blue",
+    accent: "#2563eb",
   },
   {
-    icon: "⚙️",
-    title: "Deterministic Execution",
-    desc: "Once approved, the plan executes precisely and reproducibly — null handling, encoding, scaling, outlier treatment, and duplicate removal.",
-    badge: "Reproducible",
-    badgeClass: "badge-emerald",
-    color: "#10b981",
+    title: "Deterministic execution",
+    desc: "Once approved, the plan runs precisely as described — null handling, encoding, scaling, outlier capping, duplicate removal. Same inputs produce the same outputs, every time.",
+    tag: "Reproducible",
+    tagClass: "badge-emerald",
+    accent: "#059669",
   },
   {
-    icon: "📊",
-    title: "Dataset Health Score",
-    desc: "Watch your dataset score improve from raw to ML-ready. See before/after comparisons across all quality dimensions.",
-    badge: "Analytics",
-    badgeClass: "badge-cyan",
-    color: "#06b6d4",
+    title: "Dataset health scoring",
+    desc: "See a numeric health score before and after preprocessing across completeness, consistency, and ML readiness. Not just a pass/fail — a real picture of what changed and why.",
+    tag: "Analytics",
+    tagClass: "badge-cyan",
+    accent: "#0ea5e9",
   },
   {
-    icon: "📦",
-    title: "Portable Artifacts",
-    desc: "Download the cleaned CSV, a generated preprocessing_pipeline.py, and a full AI Decision Log — everything reproducible and documented.",
-    badge: "Downloads",
-    badgeClass: "badge-amber",
-    color: "#f59e0b",
+    title: "Everything you need to ship",
+    desc: "Download the cleaned CSV, a generated Python pipeline, and a full audit log. Hand any of these to a teammate and they can reproduce your preprocessing from scratch.",
+    tag: "Portable",
+    tagClass: "badge-amber",
+    accent: "#d97706",
   },
   {
-    icon: "🎯",
-    title: "ML Recommendations",
-    desc: "Gemma analyzes your cleaned data and suggests the best ML models for your problem type with confidence scores and reasoning.",
-    badge: "ML-Ready",
-    badgeClass: "badge-rose",
-    color: "#f43f5e",
+    title: "Model suggestions that make sense",
+    desc: "Gemma looks at your cleaned data — class balance, feature count, target type — and recommends models that actually fit, with reasons. Not just a list, a ranked shortlist.",
+    tag: "ML-Ready",
+    tagClass: "badge-rose",
+    accent: "#e11d48",
   },
 ];
 
 const STEPS = [
   {
     number: "01",
-    title: "Upload Your CSV",
-    desc: "Drop any messy CSV — missing values, duplicates, mixed types. ForgeAI handles it all.",
-    icon: "📁",
-    color: "#3b82f6",
+    title: "Upload your CSV",
+    desc: "Drop any CSV file. Missing values, duplicates, mixed types, messy column names — none of that matters at this stage.",
+    accent: "#2563eb",
   },
   {
     number: "02",
-    title: "AI Profiles the Data",
-    desc: "Gemma 4 analyzes cardinality, skewness, outliers, correlations, and identifies identifier columns.",
-    icon: "🔍",
-    color: "#8b5cf6",
+    title: "Gemma profiles the data",
+    desc: "In a few seconds, Gemma analyzes cardinality, distributions, skewness, outliers, and correlations to understand what the data actually looks like.",
+    accent: "#7c3aed",
   },
   {
     number: "03",
-    title: "Review the Plan",
-    desc: "See every proposed action with reasoning. Override, approve, or modify before a single row is touched.",
-    icon: "✋",
-    color: "#06b6d4",
+    title: "Review the plan",
+    desc: "Every proposed action is shown as a card with reasoning and a confidence score. Approve, skip, or override before anything runs.",
+    accent: "#0ea5e9",
   },
   {
     number: "04",
-    title: "Execute & Download",
-    desc: "One click executes the approved plan. Download your clean dataset, pipeline, and full AI report.",
-    icon: "🚀",
-    color: "#10b981",
+    title: "Download the result",
+    desc: "Execute the plan and download your clean dataset, the Python preprocessing pipeline, and a full decision log.",
+    accent: "#059669",
   },
 ];
 
@@ -94,49 +84,38 @@ const DEMO_DECISIONS = [
   {
     column: "CustomerID",
     action: "Drop column",
-    reason: "This column appears to be a unique row identifier with cardinality equal to row count. It has no predictive value.",
+    reason: "Cardinality equals row count — this is a unique row identifier with no predictive value. Keeping it would add noise to any model.",
     confidence: 97,
-    type: "drop",
     badge: "badge-rose",
   },
   {
     column: "Age",
     action: "Median imputation",
-    reason: "14.2% missing values detected. Distribution is slightly right-skewed (skewness: 1.3), making median more robust than mean.",
+    reason: "14.2% missing values. Distribution is slightly right-skewed (skewness 1.3), making median more robust than mean here.",
     confidence: 89,
-    type: "impute",
     badge: "badge-amber",
   },
   {
     column: "Income",
     action: "Log transform + median impute",
-    reason: "Highly skewed distribution (skewness: 4.7). Log transform will normalize before scaling. 8.9% missing — median imputation recommended.",
+    reason: "Highly skewed distribution (skewness 4.7). Log transform normalizes before scaling. 8.9% nulls filled with log-median.",
     confidence: 94,
-    type: "transform",
     badge: "badge-violet",
   },
   {
     column: "Gender",
     action: "One-hot encoding",
-    reason: "Nominal categorical column with 2 unique values. One-hot encoding preferred over label encoding to avoid ordinal assumption.",
+    reason: "Nominal categorical column with 2 unique values. One-hot preferred over label encoding to avoid introducing an ordinal assumption.",
     confidence: 91,
-    type: "encode",
     badge: "badge-blue",
   },
-];
-
-const STATS = [
-  { value: "42→93", label: "Health Score Boost", icon: "📈" },
-  { value: "< 5s", label: "AI Analysis Time", icon: "⚡" },
-  { value: "100%", label: "Reproducible", icon: "🔒" },
-  { value: "15+", label: "Dataset Types Supported", icon: "📊" },
 ];
 
 function NavBar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
+    const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
@@ -150,40 +129,27 @@ function NavBar() {
         right: 0,
         zIndex: 100,
         padding: "0 40px",
-        height: "64px",
+        height: "60px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: scrolled ? "rgba(3,7,18,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(99,179,237,0.1)" : "none",
-        transition: "all 0.3s ease",
+        background: scrolled ? "rgba(8,12,20,0.92)" : "transparent",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.07)" : "none",
+        transition: "background 0.3s ease, border-color 0.3s ease",
       }}
     >
-      {/* Logo */}
-      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: "10px",
-            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "18px",
-            boxShadow: "0 0 20px rgba(59,130,246,0.4)",
-          }}
-        >
-          ⚡
-        </div>
-        <span style={{ fontWeight: 800, fontSize: "18px", letterSpacing: "-0.02em" }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect width="22" height="22" rx="6" fill="#2563eb"/>
+          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
         </span>
       </Link>
 
-      {/* Nav links */}
-      <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "28px", alignItems: "center" }}>
         {NAV_LINKS.map((l) => (
           <a key={l.href} href={l.href} className="nav-link">
             {l.label}
@@ -191,87 +157,81 @@ function NavBar() {
         ))}
       </div>
 
-      {/* CTA */}
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <Link href="/upload">
-          <button className="btn-primary" style={{ padding: "8px 20px", fontSize: "14px" }}>
-            <span>Try ForgeAI →</span>
-          </button>
-        </Link>
-      </div>
+      <Link href="/upload">
+        <button className="btn-primary" style={{ padding: "7px 18px", fontSize: "13px" }}>
+          <span>Get started</span>
+        </button>
+      </Link>
     </nav>
   );
 }
 
 function HeroSection() {
   const [typed, setTyped] = useState("");
-  const fullText = "ML-ready in seconds.";
+  const fullText = "ML-ready in under a minute.";
 
   useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i <= fullText.length) {
-        setTyped(fullText.slice(0, i));
-        i++;
-      } else {
-        clearInterval(timer);
-      }
-    }, 60);
-    return () => clearInterval(timer);
+    const delay = setTimeout(() => {
+      let i = 0;
+      const timer = setInterval(() => {
+        if (i <= fullText.length) {
+          setTyped(fullText.slice(0, i));
+          i++;
+        } else {
+          clearInterval(timer);
+        }
+      }, 55);
+      return () => clearInterval(timer);
+    }, 600);
+    return () => clearTimeout(delay);
   }, []);
 
   return (
     <section
-      className="grid-bg noise"
+      className="grid-bg"
       style={{
         position: "relative",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "120px 40px 80px",
+        padding: "120px 40px 100px",
         overflow: "hidden",
       }}
     >
-      {/* Background orbs */}
-      <div className="orb" style={{ width: 600, height: 600, background: "radial-gradient(circle, #1d4ed8, #3b82f6)", top: -200, left: -200 }} />
-      <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #5b21b6, #8b5cf6)", bottom: -100, right: -150 }} />
-      <div className="orb" style={{ width: 300, height: 300, background: "radial-gradient(circle, #065f46, #10b981)", top: "40%", right: "20%" }} />
+      {/* Soft glow blobs */}
+      <div className="orb" style={{ width: 700, height: 700, background: "radial-gradient(circle, #1e3a8a, #1d4ed8)", top: -300, left: -250 }} />
+      <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #4c1d95, #6d28d9)", bottom: -150, right: -200 }} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "900px", textAlign: "center" }}>
-        {/* Pill badge */}
-        <div style={{ marginBottom: "28px", display: "flex", justifyContent: "center" }}>
-          <span
-            className="badge-violet badge"
-            style={{ fontSize: "13px", padding: "6px 16px", gap: "8px" }}
-          >
-            <span>✨</span>
-            <span>Powered by Gemma 4 · Built for ML Engineers</span>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", textAlign: "center" }}>
+
+        <div style={{ marginBottom: "32px" }}>
+          <span className="badge badge-blue" style={{ fontSize: "12px", padding: "4px 12px" }}>
+            Powered by Gemma 4
           </span>
         </div>
 
-        {/* Headline */}
         <h1
           style={{
-            fontSize: "clamp(48px, 7vw, 88px)",
-            fontWeight: 900,
-            lineHeight: 1.05,
+            fontSize: "clamp(42px, 6.5vw, 80px)",
+            fontWeight: 800,
+            lineHeight: 1.08,
             letterSpacing: "-0.04em",
-            marginBottom: "24px",
+            marginBottom: "28px",
           }}
         >
-          Your data,{" "}
-          <span className="gradient-text">AI-cleaned.</span>
+          Your messy data,{" "}
+          <span className="gradient-text">cleaned by AI.</span>
           <br />
-          <span style={{ color: "var(--text-secondary)", fontWeight: 700, fontSize: "0.75em" }}>
+          <span style={{ color: "var(--text-secondary)", fontWeight: 600, fontSize: "0.72em", letterSpacing: "-0.03em" }}>
             {typed}
             <span
               style={{
                 display: "inline-block",
-                width: "3px",
-                height: "0.8em",
+                width: "2px",
+                height: "0.75em",
                 background: "#60a5fa",
-                marginLeft: "4px",
+                marginLeft: "3px",
                 verticalAlign: "middle",
                 animation: "blink 1s infinite",
               }}
@@ -279,80 +239,69 @@ function HeroSection() {
           </span>
         </h1>
 
-        {/* Sub */}
         <p
           style={{
-            fontSize: "clamp(16px, 2vw, 20px)",
+            fontSize: "clamp(15px, 1.8vw, 18px)",
             color: "var(--text-secondary)",
-            lineHeight: 1.7,
-            maxWidth: "680px",
-            margin: "0 auto 40px",
+            lineHeight: 1.75,
+            maxWidth: "600px",
+            margin: "0 auto 44px",
+            fontWeight: 400,
           }}
         >
-          ForgeAI doesn&apos;t just clean data. It{" "}
-          <strong style={{ color: "var(--text-primary)" }}>thinks like a data scientist</strong>, 
-          collaborates with you on every decision, and produces{" "}
-          <strong style={{ color: "var(--text-primary)" }}>reproducible ML-ready datasets</strong> with full audit trails.
+          Drop a CSV. Gemma profiles it, proposes a preprocessing plan with reasoning, and you decide what runs. No black boxes, no guessing.
         </p>
 
-        {/* CTA row */}
-        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/upload">
-            <button className="btn-primary" style={{ padding: "14px 32px", fontSize: "16px" }}>
-              <span>🚀 Start Analyzing</span>
+            <button className="btn-primary" style={{ padding: "12px 28px", fontSize: "15px" }}>
+              <span>Start analyzing</span>
             </button>
           </Link>
           <a href="#demo">
-            <button className="btn-secondary" style={{ padding: "14px 32px", fontSize: "16px" }}>
-              Watch Demo Flow →
+            <button className="btn-secondary" style={{ padding: "12px 28px", fontSize: "15px" }}>
+              See how it works
             </button>
           </a>
         </div>
 
-        {/* Stats row */}
+        {/* Metrics row */}
         <div
           style={{
             display: "flex",
-            gap: "40px",
+            gap: "0",
             justifyContent: "center",
-            marginTop: "64px",
+            marginTop: "72px",
             flexWrap: "wrap",
           }}
         >
-          {STATS.map((s) => (
-            <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.03em" }}>
-                {s.icon} <span className="gradient-text">{s.value}</span>
+          {[
+            { value: "42 → 93", label: "avg. health score gain" },
+            { value: "< 5s", label: "AI analysis time" },
+            { value: "100%", label: "reproducible output" },
+          ].map((s, i) => (
+            <div
+              key={s.label}
+              style={{
+                textAlign: "center",
+                padding: "0 32px",
+                borderLeft: i > 0 ? "1px solid var(--border)" : "none",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "clamp(22px, 3vw, 30px)",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                  marginBottom: "4px",
+                }}
+              >
+                {s.value}
               </div>
-              <div style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "4px", fontWeight: 500 }}>
-                {s.label}
-              </div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Floating mini-card */}
-      <div
-        className="glass animate-float"
-        style={{
-          position: "absolute",
-          right: "5%",
-          top: "30%",
-          padding: "16px 20px",
-          borderRadius: "14px",
-          width: "220px",
-          display: "none",
-        }}
-      >
-        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "8px" }}>Health Score</div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "28px", fontWeight: 800, color: "#f43f5e" }}>42</span>
-          <span style={{ fontSize: "24px" }}>→</span>
-          <span style={{ fontSize: "28px", fontWeight: 800, color: "#10b981" }}>93</span>
-        </div>
-        <div className="progress-bar" style={{ marginTop: "10px" }}>
-          <div className="progress-fill confidence-high" style={{ width: "93%" }} />
         </div>
       </div>
     </section>
@@ -362,54 +311,56 @@ function HeroSection() {
 function FeaturesSection() {
   return (
     <section id="features" style={{ padding: "100px 40px", maxWidth: "1200px", margin: "0 auto" }}>
-      <div style={{ textAlign: "center", marginBottom: "64px" }}>
-        <span className="badge badge-blue" style={{ marginBottom: "16px" }}>Features</span>
-        <h2 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", marginTop: "12px" }}>
-          Everything a data scientist does,{" "}
-          <span className="gradient-text">automated</span>
+      <div style={{ marginBottom: "56px" }}>
+        <p className="section-label" style={{ marginBottom: "14px" }}>What it does</p>
+        <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", maxWidth: "600px", lineHeight: 1.15 }}>
+          The full preprocessing workflow,{" "}
+          <span className="gradient-text">handled for you</span>
         </h2>
-        <p style={{ fontSize: "18px", color: "var(--text-secondary)", maxWidth: "600px", margin: "16px auto 0" }}>
-          Six pillars of intelligent data preprocessing, working together seamlessly.
-        </p>
       </div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-          gap: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "1px",
+          background: "var(--border-subtle)",
+          border: "1px solid var(--border-subtle)",
+          borderRadius: "16px",
+          overflow: "hidden",
         }}
       >
-        {FEATURE_CARDS.map((card) => (
+        {FEATURE_CARDS.map((card, i) => (
           <div
             key={card.title}
-            className="glass card-hover"
             style={{
-              borderRadius: "20px",
-              padding: "28px",
-              border: "1px solid var(--border)",
+              background: "var(--bg-card)",
+              padding: "28px 32px",
               position: "relative",
-              overflow: "hidden",
+              transition: "background 0.2s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-hover)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--bg-card)")}
           >
-            {/* Glow accent */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "2px",
-                background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`,
-              }}
-            />
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
-              <div style={{ fontSize: "36px" }}>{card.icon}</div>
-              <span className={`badge ${card.badgeClass}`}>{card.badge}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "7px",
+                  background: `${card.accent}18`,
+                  border: `1px solid ${card.accent}30`,
+                  fontSize: "14px",
+                  lineHeight: "28px",
+                  textAlign: "center",
+                }}
+              >
+                {i + 1}
+              </span>
+              <span className={`badge ${card.tagClass}`}>{card.tag}</span>
             </div>
-
-            <h3 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em" }}>
+            <h3 style={{ fontSize: "17px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
               {card.title}
             </h3>
             <p style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.7 }}>{card.desc}</p>
@@ -422,50 +373,26 @@ function FeaturesSection() {
 
 function HowItWorksSection() {
   return (
-    <section
-      id="how-it-works"
-      style={{
-        padding: "100px 40px",
-        background: "linear-gradient(180deg, transparent, rgba(10,15,30,0.6), transparent)",
-      }}
-    >
+    <section id="how-it-works" style={{ padding: "100px 40px", background: "rgba(12,17,32,0.5)" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <span className="badge badge-emerald" style={{ marginBottom: "16px" }}>Process</span>
-          <h2 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", marginTop: "12px" }}>
-            How <span className="gradient-text">ForgeAI</span> works
+        <div style={{ marginBottom: "56px" }}>
+          <p className="section-label" style={{ marginBottom: "14px" }}>The process</p>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+            Four steps from raw CSV{" "}
+            <span className="gradient-text">to production-ready data</span>
           </h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "20px" }}>
           {STEPS.map((step, i) => (
-            <div
-              key={step.number}
-              style={{ position: "relative" }}
-            >
-              {/* Connector line */}
-              {i < STEPS.length - 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "36px",
-                    left: "calc(100% - 0px)",
-                    width: "24px",
-                    height: "2px",
-                    background: `linear-gradient(90deg, ${step.color}, transparent)`,
-                    zIndex: 1,
-                    display: "none",
-                  }}
-                />
-              )}
-
+            <div key={step.number} style={{ position: "relative" }}>
               <div
-                className="glass"
                 style={{
-                  borderRadius: "20px",
-                  padding: "28px",
+                  borderRadius: "14px",
+                  padding: "26px",
                   height: "100%",
                   border: "1px solid var(--border)",
+                  background: "var(--bg-card)",
                   position: "relative",
                   overflow: "hidden",
                 }}
@@ -476,43 +403,31 @@ function HowItWorksSection() {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: "3px",
-                    background: step.color,
-                    opacity: 0.8,
+                    height: "2px",
+                    background: step.accent,
+                    opacity: 0.6,
                   }}
                 />
 
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      width: "44px",
-                      height: "44px",
-                      borderRadius: "12px",
-                      background: `${step.color}20`,
-                      border: `1px solid ${step.color}40`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "22px",
-                    }}
-                  >
-                    {step.icon}
-                  </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "18px" }}>
                   <span
                     style={{
-                      fontSize: "36px",
+                      fontSize: "40px",
                       fontWeight: 900,
-                      color: `${step.color}30`,
+                      color: `${step.accent}20`,
                       letterSpacing: "-0.04em",
                       lineHeight: 1,
                     }}
                   >
                     {step.number}
                   </span>
+                  {i < STEPS.length - 1 && (
+                    <span style={{ fontSize: "12px", color: "var(--text-dimmed)", marginLeft: "auto" }}>Next</span>
+                  )}
                 </div>
 
-                <h3 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "10px" }}>{step.title}</h3>
-                <p style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.7 }}>{step.desc}</p>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em" }}>{step.title}</h3>
+                <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.7 }}>{step.desc}</p>
               </div>
             </div>
           ))}
@@ -525,123 +440,127 @@ function HowItWorksSection() {
 function DemoSection() {
   const [selected, setSelected] = useState<Record<number, boolean>>({ 0: false, 1: true, 2: true, 3: true });
 
+  const keptCount = Object.values(selected).filter(Boolean).length;
+
   return (
     <section id="demo" style={{ padding: "100px 40px" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <span className="badge badge-violet" style={{ marginBottom: "16px" }}>Interactive Preview</span>
-          <h2 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", marginTop: "12px" }}>
-            See the AI Plan Review — <span className="gradient-text">live</span>
+      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+        <div style={{ marginBottom: "40px" }}>
+          <p className="section-label" style={{ marginBottom: "14px" }}>Interactive preview</p>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "14px", lineHeight: 1.15 }}>
+            This is what the{" "}
+            <span className="gradient-text">review step looks like</span>
           </h2>
-          <p style={{ fontSize: "18px", color: "var(--text-secondary)", maxWidth: "560px", margin: "16px auto 0" }}>
-            Every proposed action comes with Gemma&apos;s reasoning. You decide what runs.
+          <p style={{ fontSize: "15px", color: "var(--text-secondary)", maxWidth: "500px", lineHeight: 1.65 }}>
+            Each action Gemma proposes gets a card. Toggle to keep or skip. Nothing executes until you say so.
           </p>
         </div>
 
-        {/* Demo card: AI decisions */}
         <div
-          className="glass-bright"
           style={{
-            borderRadius: "24px",
-            padding: "32px",
-            border: "1px solid var(--border-bright)",
+            borderRadius: "16px",
+            border: "1px solid var(--border-strong)",
+            background: "var(--bg-card)",
+            overflow: "hidden",
           }}
         >
-          {/* Header */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+          {/* Panel header */}
+          <div
+            style={{
+              padding: "16px 22px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "var(--bg-secondary)",
+            }}
+          >
             <div>
-              <h3 style={{ fontWeight: 700, fontSize: "18px" }}>AI Preprocessing Plan</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "13px", marginTop: "4px" }}>
-                Gemma analyzed <strong style={{ color: "var(--text-primary)" }}>customer_churn.csv</strong> · 
-                {" "}<span className="badge badge-emerald" style={{ fontSize: "11px" }}>4 actions proposed</span>
-              </p>
+              <span style={{ fontWeight: 600, fontSize: "14px" }}>AI Preprocessing Plan</span>
+              <span style={{ color: "var(--text-muted)", fontSize: "13px", marginLeft: "10px" }}>
+                customer_churn.csv
+              </span>
             </div>
-            <Link href="/review">
-              <button className="btn-primary" style={{ padding: "10px 20px", fontSize: "14px" }}>
-                <span>Approve Plan →</span>
-              </button>
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span className="badge badge-emerald">{keptCount} approved</span>
+              <Link href="/review">
+                <button className="btn-primary" style={{ padding: "6px 14px", fontSize: "13px" }}>
+                  <span>Open full review</span>
+                </button>
+              </Link>
+            </div>
           </div>
 
           {/* Decision cards */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div style={{ padding: "12px" }}>
             {DEMO_DECISIONS.map((d, i) => (
               <div
                 key={i}
-                className="decision-card"
                 style={{
-                  borderRadius: "14px",
-                  padding: "18px 20px",
-                  background: selected[i] ? "rgba(59,130,246,0.05)" : "rgba(244,63,94,0.04)",
-                  border: `1px solid ${selected[i] ? "rgba(99,179,237,0.15)" : "rgba(244,63,94,0.15)"}`,
+                  borderRadius: "10px",
+                  padding: "14px 16px",
+                  marginBottom: i < DEMO_DECISIONS.length - 1 ? "6px" : "0",
+                  border: `1px solid ${selected[i] ? "var(--border)" : "rgba(225,29,72,0.15)"}`,
+                  background: selected[i] ? "transparent" : "rgba(225,29,72,0.03)",
                   display: "flex",
-                  gap: "16px",
+                  gap: "12px",
                   alignItems: "flex-start",
+                  opacity: selected[i] ? 1 : 0.6,
+                  transition: "all 0.2s ease",
                 }}
               >
-                {/* Toggle */}
                 <button
                   onClick={() => setSelected((p) => ({ ...p, [i]: !p[i] }))}
                   style={{
                     flexShrink: 0,
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "10px",
-                    border: "none",
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "6px",
+                    border: `1px solid ${selected[i] ? "rgba(5,150,105,0.35)" : "rgba(225,29,72,0.35)"}`,
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "18px",
-                    transition: "all 0.2s ease",
-                    background: selected[i] ? "rgba(16,185,129,0.15)" : "rgba(244,63,94,0.1)",
+                    fontSize: "14px",
+                    background: selected[i] ? "rgba(5,150,105,0.1)" : "rgba(225,29,72,0.08)",
+                    transition: "all 0.18s ease",
+                    color: selected[i] ? "#6ee7b7" : "#fda4af",
+                    fontWeight: 600,
                   }}
                 >
                   {selected[i] ? "✓" : "✗"}
                 </button>
 
-                {/* Content */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "6px", flexWrap: "wrap" }}>
-                    <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "14px", fontWeight: 600, color: "#93c5fd" }}>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "4px", flexWrap: "wrap" }}>
+                    <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 600, color: "#93c5fd" }}>
                       {d.column}
                     </code>
                     <span className={`badge ${d.badge}`}>{d.action}</span>
                   </div>
-                  <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.6 }}>{d.reason}</p>
+                  <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.6 }}>{d.reason}</p>
                 </div>
 
-                {/* Confidence */}
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontSize: "22px", fontWeight: 800, color: d.confidence > 90 ? "#10b981" : "#f59e0b" }}>
+                  <div style={{ fontSize: "17px", fontWeight: 800, color: d.confidence > 90 ? "#059669" : "#d97706" }}>
                     {d.confidence}%
                   </div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>confidence</div>
-                  <div className="progress-bar" style={{ width: "60px", marginTop: "6px" }}>
-                    <div
-                      className={`progress-fill ${d.confidence > 90 ? "confidence-high" : "confidence-medium"}`}
-                      style={{ width: `${d.confidence}%` }}
-                    />
-                  </div>
+                  <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "1px" }}>confidence</div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Tip */}
           <div
             style={{
-              marginTop: "20px",
-              padding: "12px 16px",
-              borderRadius: "10px",
-              background: "rgba(139,92,246,0.08)",
-              border: "1px solid rgba(139,92,246,0.2)",
-              fontSize: "13px",
-              color: "#c4b5fd",
+              padding: "12px 22px",
+              borderTop: "1px solid var(--border)",
+              fontSize: "12px",
+              color: "var(--text-muted)",
+              background: "var(--bg-secondary)",
             }}
           >
-            💡 <strong>Tip:</strong> Click the toggle to keep or remove any action. This is your differentiator — 
-            ForgeAI <em>never</em> runs without your approval.
+            Click any toggle to approve or skip an action. Changes take effect only after you confirm.
           </div>
         </div>
       </div>
@@ -657,38 +576,35 @@ function CTASection() {
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
+        background: "rgba(12,17,32,0.4)",
       }}
     >
-      <div className="orb" style={{ width: 400, height: 400, background: "radial-gradient(circle, #1d4ed8, #3b82f6)", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+      <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #1e3a8a, #2563eb)", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.15 }} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "700px", margin: "0 auto" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "580px", margin: "0 auto" }}>
+        <p className="section-label" style={{ marginBottom: "20px" }}>Ready to start?</p>
         <h2
           style={{
-            fontSize: "clamp(36px, 6vw, 64px)",
-            fontWeight: 900,
+            fontSize: "clamp(32px, 5.5vw, 58px)",
+            fontWeight: 800,
             letterSpacing: "-0.04em",
             marginBottom: "20px",
             lineHeight: 1.1,
           }}
         >
-          Ready to forge your{" "}
-          <span className="gradient-text">perfect dataset?</span>
+          Stop cleaning data{" "}
+          <span className="gradient-text">by hand</span>
         </h2>
-        <p style={{ fontSize: "18px", color: "var(--text-secondary)", marginBottom: "40px", lineHeight: 1.6 }}>
-          Upload your first CSV in seconds. No account required.
-          <br />
-          Get an ML-ready dataset and reproducible pipeline instantly.
+        <p style={{ fontSize: "16px", color: "var(--text-secondary)", marginBottom: "36px", lineHeight: 1.7 }}>
+          Upload a CSV, review what Gemma recommends, and get a production-ready dataset in minutes. No account needed.
         </p>
-        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/upload">
-            <button className="btn-primary" style={{ padding: "16px 40px", fontSize: "17px" }}>
-              <span>🚀 Launch ForgeAI</span>
-            </button>
-          </Link>
-        </div>
-
-        <p style={{ marginTop: "24px", fontSize: "13px", color: "var(--text-muted)" }}>
-          Titanic · Iris · Heart Disease · Customer Churn · Adult Income · Wine Quality · and more
+        <Link href="/upload">
+          <button className="btn-primary" style={{ padding: "13px 36px", fontSize: "15px" }}>
+            <span>Upload a dataset</span>
+          </button>
+        </Link>
+        <p style={{ marginTop: "20px", fontSize: "12px", color: "var(--text-muted)" }}>
+          Works with Titanic, customer churn, heart disease, income data, and more
         </p>
       </div>
     </section>
@@ -699,8 +615,8 @@ function Footer() {
   return (
     <footer
       style={{
-        padding: "40px",
-        borderTop: "1px solid var(--border)",
+        padding: "32px 40px",
+        borderTop: "1px solid var(--border-subtle)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -708,44 +624,31 @@ function Footer() {
         gap: "16px",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: "8px",
-            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-          }}
-        >
-          ⚡
-        </div>
-        <span style={{ fontWeight: 700, fontSize: "15px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+          <rect width="22" height="22" rx="6" fill="#2563eb"/>
+          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontWeight: 700, fontSize: "14px" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
         </span>
-        <span style={{ color: "var(--text-muted)", fontSize: "14px", marginLeft: "8px" }}>
-          · AI Data Scientist
-        </span>
+        <span style={{ color: "var(--text-dimmed)", fontSize: "13px", marginLeft: "6px" }}>· AI Data Preprocessing</span>
       </div>
 
       <div style={{ display: "flex", gap: "24px" }}>
-        {["Upload", "Review", "Results", "GitHub"].map((l) => (
-          <a
-            key={l}
-            href={l === "GitHub" ? "https://github.com" : `/${l.toLowerCase()}`}
-            className="nav-link"
-            style={{ fontSize: "13px" }}
-          >
-            {l}
+        {[
+          { label: "Upload", href: "/upload" },
+          { label: "Review", href: "/review" },
+          { label: "Results", href: "/results" },
+        ].map((l) => (
+          <a key={l.label} href={l.href} className="nav-link" style={{ fontSize: "13px" }}>
+            {l.label}
           </a>
         ))}
       </div>
 
-      <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>
-        Built for the ForgeAI Sprint · July 2026
+      <p style={{ color: "var(--text-muted)", fontSize: "12px" }}>
+        ForgeAI — July 2026
       </p>
     </footer>
   );
