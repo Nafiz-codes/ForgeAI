@@ -1,0 +1,233 @@
+{
+    "dataset": {
+        "rows": 891,
+        "columns": 12,
+        "duplicate_rows": 0,
+        "memory_usage_mb": 0.28,
+        "health_score": 93
+    },
+    "columns": [
+        {
+            "name": "PassengerId",
+            "dtype": "int64",
+            "semantic_type": "identifier",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 891,
+            "possible_identifier": true
+        },
+        {
+            "name": "Survived",
+            "dtype": "int64",
+            "semantic_type": "numeric",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 2,
+            "possible_identifier": false,
+            "mean": 0.384,
+            "median": 0.0,
+            "std": 0.487,
+            "min": 0,
+            "max": 1,
+            "skewness": 0.479,
+            "outlier_count": 0
+        },
+        {
+            "name": "Pclass",
+            "dtype": "int64",
+            "semantic_type": "numeric",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 3,
+            "possible_identifier": false,
+            "mean": 2.309,
+            "median": 3.0,
+            "std": 0.836,
+            "min": 1,
+            "max": 3,
+            "skewness": -0.631,
+            "outlier_count": 0
+        },
+        {
+            "name": "Name",
+            "dtype": "str",
+            "semantic_type": "identifier",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 891,
+            "possible_identifier": true
+        },
+        {
+            "name": "Sex",
+            "dtype": "str",
+            "semantic_type": "categorical",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 2,
+            "possible_identifier": false,
+            "top_values": [
+                "male",
+                "female"
+            ],
+            "top_counts": [
+                577,
+                314
+            ]
+        },
+        {
+            "name": "Age",
+            "dtype": "float64",
+            "semantic_type": "numeric",
+            "missing_count": 177,
+            "missing_percent": 19.87,
+            "risk": "Medium",
+            "constant": false,
+            "unique_values": 88,
+            "possible_identifier": false,
+            "mean": 29.699,
+            "median": 28.0,
+            "std": 14.526,
+            "min": 0.42,
+            "max": 80.0,
+            "skewness": 0.389,
+            "outlier_count": 11
+        },
+        {
+            "name": "SibSp",
+            "dtype": "int64",
+            "semantic_type": "numeric",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 7,
+            "possible_identifier": false,
+            "mean": 0.523,
+            "median": 0.0,
+            "std": 1.103,
+            "min": 0,
+            "max": 8,
+            "skewness": 3.695,
+            "outlier_count": 46
+        },
+        {
+            "name": "Parch",
+            "dtype": "int64",
+            "semantic_type": "numeric",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 7,
+            "possible_identifier": false,
+            "mean": 0.382,
+            "median": 0.0,
+            "std": 0.806,
+            "min": 0,
+            "max": 6,
+            "skewness": 2.749,
+            "outlier_count": 213
+        },
+        {
+            "name": "Ticket",
+            "dtype": "str",
+            "semantic_type": "text",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 681,
+            "possible_identifier": false,
+            "top_values": [
+                "347082",
+                "1601",
+                "CA. 2343",
+                "3101295",
+                "CA 2144"
+            ],
+            "top_counts": [
+                7,
+                7,
+                7,
+                6,
+                6
+            ]
+        },
+        {
+            "name": "Fare",
+            "dtype": "float64",
+            "semantic_type": "numeric",
+            "missing_count": 0,
+            "missing_percent": 0.0,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 248,
+            "possible_identifier": false,
+            "mean": 32.204,
+            "median": 14.454,
+            "std": 49.693,
+            "min": 0.0,
+            "max": 512.329,
+            "skewness": 4.787,
+            "outlier_count": 116
+        },
+        {
+            "name": "Cabin",
+            "dtype": "str",
+            "semantic_type": "categorical",
+            "missing_count": 687,
+            "missing_percent": 77.1,
+            "risk": "High",
+            "constant": false,
+            "unique_values": 147,
+            "possible_identifier": false,
+            "top_values": [
+                null,
+                "G6",
+                "C23 C25 C27",
+                "B96 B98",
+                "F33"
+            ],
+            "top_counts": [
+                687,
+                4,
+                4,
+                4,
+                3
+            ]
+        },
+        {
+            "name": "Embarked",
+            "dtype": "str",
+            "semantic_type": "categorical",
+            "missing_count": 2,
+            "missing_percent": 0.22,
+            "risk": "Low",
+            "constant": false,
+            "unique_values": 3,
+            "possible_identifier": false,
+            "top_values": [
+                "S",
+                "C",
+                "Q",
+                null
+            ],
+            "top_counts": [
+                644,
+                168,
+                77,
+                2
+            ]
+        }
+    ]
+}

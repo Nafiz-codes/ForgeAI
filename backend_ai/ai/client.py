@@ -1,7 +1,16 @@
+import json
 import os
+import time
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
+
+from ai.prompt_builder import PromptBuilder
+from config import (
+    MODEL_NAME,
+    TEMPERATURE,
+    MAX_RETRIES,
+)
 
 load_dotenv()
 
@@ -10,32 +19,78 @@ class AIClient:
 
     def __init__(self):
 
-        self.client = OpenAI(
-            api_key=os.getenv("OPENAI_API_KEY")
-        )
+        api_key = os.getenv("GEMMA_API_KEY")
 
-        self.model = "gpt-4.1-mini"
+        if not api_key:
+            raise ValueError(
+                "GEMMA_API_KEY was not found in your .env file."
+            )
 
-    def analyze(self, prompt: str) -> str:
-        """
-        Send a prompt to the AI model.
+        self.client = genai.Client(api_key=api_key)
 
-        Returns the raw text response.
-        """
+        self.model = MODEL_NAME
 
-        response = self.client.responses.create(
+        self.prompt_builder = PromptBuilder()
+
+    def _send_prompt(self, prompt: str) -> str:
+
+        response = self.client.models.generate_content(
             model=self.model,
-            input=prompt
+            contents=prompt,
+            config={
+                "temperature": TEMPERATURE,
+            },
         )
 
-        return response.output_text
+        return response.text
+
+    def generate(self, profile: dict) -> dict:
+
+        prompt = self.prompt_builder.build_prompt(profile)
+
+        last_error = None
+
+        for attempt in range(MAX_RETRIES):
+
+            try:
+
+                raw_response = self._send_prompt(prompt)
+
+                # Sometimes models wrap JSON inside markdown.
+                raw_response = (
+                    raw_response
+                    .replace("```json", "")
+                    .replace("```", "")
+                    .strip()
+                )
+
+                return json.loads(raw_response)
+
+            except Exception as e:
+
+                last_error = e
+
+                print(
+                    f"Retry {attempt + 1}/{MAX_RETRIES}"
+                )
+
+                time.sleep(1)
+
+        raise RuntimeError(
+            f"Gemma failed after {MAX_RETRIES} attempts.\n\n{last_error}"
+        )
+
 
 if __name__ == "__main__":
 
+    from config import PROFILE_FILE
+
+    with open(PROFILE_FILE, "r", encoding="utf-8") as f:
+
+        profile = json.load(f)
+
     client = AIClient()
 
-    response = client.analyze(
-        "Reply with exactly: ForgeAI client works."
-    )
+    result = client.generate(profile)
 
-    print(response)
+    print(json.dumps(result, indent=4))

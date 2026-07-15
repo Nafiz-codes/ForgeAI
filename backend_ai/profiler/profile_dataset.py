@@ -36,7 +36,7 @@ class DatasetProfiler:
 
         return profile
 
-    def save_profile(self, output_path: str):
+    def save_profile(self, output_path):
         """
         Saves the generated profile as JSON.
         """
@@ -44,11 +44,12 @@ class DatasetProfiler:
         profile = self.profile()
 
         with open(output_path, "w", encoding="utf-8") as f:
-            print(json.dumps(
+            json.dump(
                 profile,
+                f,
                 indent=4,
                 default=json_converter
-            ))
+            )
 
         print(f"Profile saved to {output_path}")
 
@@ -98,7 +99,7 @@ class DatasetProfiler:
                 )
 
             profiles.append(column_profile)
-        print(column, series.dtype)
+            print(column, series.dtype)
         return profiles
     
     def _numeric_profile(self, series):
@@ -129,9 +130,18 @@ class DatasetProfiler:
 
         values = series.value_counts(dropna=False).head(5)
 
+        top_values = []
+
+        for value in values.index:
+
+            if pd.isna(value):
+                top_values.append(None)      # becomes null in JSON
+            else:
+                top_values.append(str(value))
+
         return {
-            "top_values": values.index.astype(str).tolist(),
-            "top_counts": values.values.tolist()
+            "top_values": top_values,
+            "top_counts": [int(v) for v in values.values]
         }
     
     def _semantic_type(self, column_name, series):
