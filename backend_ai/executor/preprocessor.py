@@ -1,5 +1,10 @@
 import pandas as pd
-
+import numpy as np
+from reports.report_generator import ReportGenerator
+from sklearn.preprocessing import (
+    OneHotEncoder,
+    RobustScaler
+)
 
 class DatasetPreprocessor:
 
@@ -32,6 +37,18 @@ class DatasetPreprocessor:
 
                 self._mode_impute(column)
 
+            elif "one-hot" in action:
+
+                self._one_hot_encode(column)
+
+            elif "log" in action:
+
+                self._log_transform(column)
+
+            elif "robust" in action:
+
+                self._robust_scale(column)
+
         print("\nExecution Complete.\n")
 
         return self.df
@@ -44,17 +61,53 @@ class DatasetPreprocessor:
 
     def _median_impute(self, column):
 
-        self.df[column].fillna(
-            self.df[column].median(),
-            inplace=True
-        )
+        self.df[column] = self.df[column].fillna(
+        self.df[column].median()
+    )
 
 
     def _mode_impute(self, column):
 
-        self.df[column].fillna(
-            self.df[column].mode()[0],
-            inplace=True
+        self.df[column] = self.df[column].fillna(
+        self.df[column].mode()[0]
+    )
+        
+    def _one_hot_encode(self, column):
+
+        encoder = OneHotEncoder(
+            sparse_output=False,
+            handle_unknown="ignore"
+        )
+
+        encoded = encoder.fit_transform(
+            self.df[[column]]
+        )
+
+        encoded_df = pd.DataFrame(
+            encoded,
+            columns=encoder.get_feature_names_out([column]),
+            index=self.df.index
+        )
+
+        self.df.drop(columns=[column], inplace=True)
+
+        self.df = pd.concat(
+            [self.df, encoded_df],
+            axis=1
+        )
+
+
+    def _log_transform(self, column):
+
+        self.df[column] = np.log1p(self.df[column])
+
+
+    def _robust_scale(self, column):
+
+        scaler = RobustScaler()
+
+        self.df[[column]] = scaler.fit_transform(
+            self.df[[column]]
         )
     
 if __name__ == "__main__":
@@ -84,7 +137,11 @@ if __name__ == "__main__":
     # Execute preprocessing
     preprocessor = DatasetPreprocessor(df, plan)
     clean_df = preprocessor.execute()
+    report = ReportGenerator(profile, plan)
 
+    report.save(
+        OUTPUTS_DIR / "preprocessing_report.json"
+    )
     # Save cleaned dataset
     OUTPUTS_DIR.mkdir(exist_ok=True)
 
