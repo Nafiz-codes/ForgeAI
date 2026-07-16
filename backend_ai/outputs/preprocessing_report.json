@@ -1,0 +1,68 @@
+{
+    "dataset": {
+        "rows": 891,
+        "columns": 12,
+        "health_score": 93
+    },
+    "operations": [
+        {
+            "column": "Age",
+            "issue": "Missing values (19.87%)",
+            "action": "Impute with median",
+            "reason": "Median is more robust to the observed skewness (0.389) than the mean.",
+            "confidence": 95
+        },
+        {
+            "column": "Cabin",
+            "issue": "High missingness (77.1%)",
+            "action": "Drop column",
+            "reason": "The percentage of missing values is too high to perform reliable imputation.",
+            "confidence": 98
+        },
+        {
+            "column": "Embarked",
+            "issue": "Missing values (0.22%)",
+            "action": "Impute with mode",
+            "reason": "Minimal missingness in a categorical feature can be safely handled by the most frequent value.",
+            "confidence": 95
+        },
+        {
+            "column": "Sex",
+            "issue": "Categorical data type",
+            "action": "One-Hot Encoding",
+            "reason": "Converts categorical string labels into a numeric format suitable for machine learning algorithms.",
+            "confidence": 100
+        },
+        {
+            "column": "Fare",
+            "issue": "High skewness (4.787) and outliers",
+            "action": "Log Transformation",
+            "reason": "Log transformation reduces the impact of extreme outliers and normalizes highly skewed distributions.",
+            "confidence": 92
+        },
+        {
+            "column": "SibSp",
+            "issue": "High skewness (3.695) and outliers",
+            "action": "RobustScaler",
+            "reason": "RobustScaler uses the interquartile range, making it resilient to the significant number of outliers.",
+            "confidence": 88
+        },
+        {
+            "column": "Parch",
+            "issue": "High skewness (2.749) and outliers",
+            "action": "RobustScaler",
+            "reason": "RobustScaler is preferred for features with high outlier counts to prevent scaling distortion.",
+            "confidence": 88
+        },
+        {
+            "column": "Ticket",
+            "issue": "High cardinality text",
+            "action": "Drop column",
+            "reason": "High cardinality text columns typically require complex NLP and can lead to overfitting in standard pipelines.",
+            "confidence": 85
+        }
+    ],
+    "summary": "The dataset is generally high quality but requires specific handling for missing values in Age and Cabin, high-cardinality text in Ticket, and significant skewness/outliers in Fare, SibSp, and Parch.",
+    "recommendations": "Impute Age with median, drop Cabin and Ticket, encode Sex and Embarked, and apply log/robust scaling to skewed numerical features.",
+    "confidence": 93
+}
