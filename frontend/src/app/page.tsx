@@ -12,14 +12,14 @@ const NAV_LINKS = [
 const FEATURE_CARDS = [
   {
     title: "Reasoning, not rules",
-    desc: "Gemma reads your dataset profile and reasons about it — the same way a senior data scientist would. It considers skewness, cardinality, null patterns, and outlier distribution before proposing anything.",
+    desc: "Gemma reads your dataset profile and examines it — the same way a senior data scientist would. It considers skewness, cardinality, null patterns, and outlier distribution before proposing anything.",
     tag: "AI-Powered",
     tagClass: "badge-violet",
     accent: "#7c3aed",
   },
   {
     title: "You stay in control",
-    desc: "Every proposed action comes with an explanation. Override what you disagree with, keep columns Gemma flagged for removal, and approve only what makes sense. Nothing runs without your sign-off.",
+    desc: "Every proposed action comes with an explanation. You can override what you disagree with, keep columns flagged for removal, and approve only what makes sense. Nothing runs without your approval.",
     tag: "Interactive",
     tagClass: "badge-blue",
     accent: "#2563eb",
@@ -153,8 +153,8 @@ function NavBar() {
     >
       <Link href="/" style={{ display: "flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <rect width="22" height="22" rx="6" fill="#2563eb"/>
-          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <rect width="22" height="22" rx="6" fill="#2563eb" />
+          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
@@ -183,7 +183,7 @@ function NavBar() {
 
 function HeroSection() {
   const [typed, setTyped] = useState("");
-  const fullText = "ML-ready in under a minute.";
+  const fullText = "ML-ready datasets in under a minute.";
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -781,8 +781,8 @@ function Footer() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-          <rect width="22" height="22" rx="6" fill="#2563eb"/>
-          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <rect width="22" height="22" rx="6" fill="#2563eb" />
+          <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
