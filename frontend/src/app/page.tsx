@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { DarkModeToggle, useTheme } from "@/lib/theme";
 
 const NAV_LINKS = [
   { href: "#features", label: "Features" },
@@ -113,12 +114,15 @@ const DEMO_DECISIONS = [
 
 function NavBar() {
   const [scrolled, setScrolled] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const isDark = theme === "dark";
 
   return (
     <nav
@@ -133,9 +137,17 @@ function NavBar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: scrolled ? "rgba(8,12,20,0.92)" : "transparent",
+        background: scrolled
+          ? isDark
+            ? "rgba(8,12,20,0.92)"
+            : "rgba(255,255,255,0.92)"
+          : "transparent",
         backdropFilter: scrolled ? "blur(16px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.07)" : "none",
+        borderBottom: scrolled
+          ? isDark
+            ? "1px solid rgba(255,255,255,0.07)"
+            : "1px solid rgba(0,0,0,0.07)"
+          : "none",
         transition: "background 0.3s ease, border-color 0.3s ease",
       }}
     >
@@ -144,7 +156,7 @@ function NavBar() {
           <rect width="22" height="22" rx="6" fill="#2563eb"/>
           <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em" }}>
+        <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
         </span>
       </Link>
@@ -157,11 +169,14 @@ function NavBar() {
         ))}
       </div>
 
-      <Link href="/upload">
-        <button className="btn-primary" style={{ padding: "7px 18px", fontSize: "13px" }}>
-          <span>Get started</span>
-        </button>
-      </Link>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <DarkModeToggle />
+        <Link href="/upload">
+          <button className="btn-primary" style={{ padding: "7px 18px", fontSize: "13px" }}>
+            <span>Get started</span>
+          </button>
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -169,6 +184,8 @@ function NavBar() {
 function HeroSection() {
   const [typed, setTyped] = useState("");
   const fullText = "ML-ready in under a minute.";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -188,7 +205,6 @@ function HeroSection() {
 
   return (
     <section
-      className="grid-bg"
       style={{
         position: "relative",
         minHeight: "100vh",
@@ -197,14 +213,108 @@ function HeroSection() {
         justifyContent: "center",
         padding: "120px 40px 100px",
         overflow: "hidden",
+        background: isDark
+          ? "#080c14"
+          : "linear-gradient(135deg, #dbeafe 0%, #ede9fe 45%, #d1fae5 100%)",
       }}
     >
-      {/* Soft glow blobs */}
-      <div className="orb" style={{ width: 700, height: 700, background: "radial-gradient(circle, #1e3a8a, #1d4ed8)", top: -300, left: -250 }} />
-      <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #4c1d95, #6d28d9)", bottom: -150, right: -200 }} />
+      {/* Animated color blobs */}
+      <div
+        className="animate-blob1"
+        style={{
+          position: "absolute",
+          width: 650,
+          height: 650,
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, #1e3a8a, #1d4ed8)"
+            : "radial-gradient(circle, #93c5fd, #3b82f6)",
+          filter: "blur(100px)",
+          opacity: isDark ? 0.28 : 0.35,
+          top: -200,
+          left: -220,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        className="animate-blob2"
+        style={{
+          position: "absolute",
+          width: 500,
+          height: 500,
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, #4c1d95, #6d28d9)"
+            : "radial-gradient(circle, #c4b5fd, #7c3aed)",
+          filter: "blur(100px)",
+          opacity: isDark ? 0.25 : 0.32,
+          bottom: -150,
+          right: -150,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        className="animate-blob3"
+        style={{
+          position: "absolute",
+          width: 320,
+          height: 320,
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, #065f46, #059669)"
+            : "radial-gradient(circle, #6ee7b7, #059669)",
+          filter: "blur(80px)",
+          opacity: isDark ? 0.18 : 0.28,
+          top: "40%",
+          right: "15%",
+          pointerEvents: "none",
+        }}
+      />
+      {/* Extra blob for reference picture parity (yellow/teal) */}
+      <div
+        className="animate-blob1"
+        style={{
+          position: "absolute",
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, #78350f, #d97706)"
+            : "radial-gradient(circle, #fde68a, #f59e0b)",
+          filter: "blur(80px)",
+          opacity: isDark ? 0.14 : 0.24,
+          bottom: "15%",
+          left: "20%",
+          pointerEvents: "none",
+          animationDelay: "3s",
+        }}
+      />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", textAlign: "center" }}>
+      {/* Subtle grid */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: isDark
+            ? "linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)"
+            : "linear-gradient(rgba(37,99,235,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.05) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
 
+      {/* Glassmorphism main card */}
+      <div
+        className="glass-panel"
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: "860px",
+          width: "100%",
+          padding: "56px 64px",
+          textAlign: "center",
+        }}
+      >
         <div style={{ marginBottom: "32px" }}>
           <span className="badge badge-blue" style={{ fontSize: "12px", padding: "4px 12px" }}>
             Powered by Gemma 4
@@ -218,6 +328,7 @@ function HeroSection() {
             lineHeight: 1.08,
             letterSpacing: "-0.04em",
             marginBottom: "28px",
+            color: "var(--text-primary)",
           }}
         >
           Your messy data,{" "}
@@ -271,8 +382,10 @@ function HeroSection() {
             display: "flex",
             gap: "0",
             justifyContent: "center",
-            marginTop: "72px",
+            marginTop: "56px",
             flexWrap: "wrap",
+            paddingTop: "32px",
+            borderTop: "1px solid var(--border)",
           }}
         >
           {[
@@ -309,11 +422,21 @@ function HeroSection() {
 }
 
 function FeaturesSection() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <section id="features" style={{ padding: "100px 40px", maxWidth: "1200px", margin: "0 auto" }}>
+    <section
+      id="features"
+      style={{
+        padding: "100px 40px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+      }}
+    >
       <div style={{ marginBottom: "56px" }}>
         <p className="section-label" style={{ marginBottom: "14px" }}>What it does</p>
-        <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", maxWidth: "600px", lineHeight: 1.15 }}>
+        <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", maxWidth: "600px", lineHeight: 1.15, color: "var(--text-primary)" }}>
           The full preprocessing workflow,{" "}
           <span className="gradient-text">handled for you</span>
         </h2>
@@ -323,25 +446,35 @@ function FeaturesSection() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "1px",
-          background: "var(--border-subtle)",
-          border: "1px solid var(--border-subtle)",
+          gap: isDark ? "1px" : "16px",
+          background: isDark ? "var(--border-subtle)" : "transparent",
+          border: isDark ? "1px solid var(--border-subtle)" : "none",
           borderRadius: "16px",
-          overflow: "hidden",
+          overflow: isDark ? "hidden" : "visible",
         }}
       >
         {FEATURE_CARDS.map((card, i) => (
           <div
             key={card.title}
+            className={isDark ? "" : "dash-card"}
             style={{
               background: "var(--bg-card)",
               padding: "28px 32px",
               position: "relative",
-              transition: "background 0.2s ease",
+              transition: "background 0.2s ease, box-shadow 0.2s ease",
+              borderRadius: isDark ? "0" : "var(--radius-lg)",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-hover)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--bg-card)")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--bg-card-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--bg-card)";
+            }}
           >
+            {/* Top accent line for light mode */}
+            {!isDark && (
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: card.accent, borderRadius: "var(--radius-lg) var(--radius-lg) 0 0", opacity: 0.7 }} />
+            )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
               <span
                 style={{
@@ -354,13 +487,15 @@ function FeaturesSection() {
                   fontSize: "14px",
                   lineHeight: "28px",
                   textAlign: "center",
+                  color: card.accent,
+                  fontWeight: 700,
                 }}
               >
                 {i + 1}
               </span>
               <span className={`badge ${card.tagClass}`}>{card.tag}</span>
             </div>
-            <h3 style={{ fontSize: "17px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
+            <h3 style={{ fontSize: "17px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em", lineHeight: 1.3, color: "var(--text-primary)" }}>
               {card.title}
             </h3>
             <p style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.7 }}>{card.desc}</p>
@@ -372,12 +507,21 @@ function FeaturesSection() {
 }
 
 function HowItWorksSection() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <section id="how-it-works" style={{ padding: "100px 40px", background: "rgba(12,17,32,0.5)" }}>
+    <section
+      id="how-it-works"
+      style={{
+        padding: "100px 40px",
+        background: isDark ? "rgba(12,17,32,0.5)" : "rgba(37,99,235,0.03)",
+      }}
+    >
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <div style={{ marginBottom: "56px" }}>
           <p className="section-label" style={{ marginBottom: "14px" }}>The process</p>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.15, color: "var(--text-primary)" }}>
             Four steps from raw CSV{" "}
             <span className="gradient-text">to production-ready data</span>
           </h2>
@@ -387,11 +531,12 @@ function HowItWorksSection() {
           {STEPS.map((step, i) => (
             <div key={step.number} style={{ position: "relative" }}>
               <div
+                className={isDark ? "" : "dash-card"}
                 style={{
                   borderRadius: "14px",
                   padding: "26px",
                   height: "100%",
-                  border: "1px solid var(--border)",
+                  border: isDark ? "1px solid var(--border)" : undefined,
                   background: "var(--bg-card)",
                   position: "relative",
                   overflow: "hidden",
@@ -403,9 +548,9 @@ function HowItWorksSection() {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: "2px",
+                    height: "3px",
                     background: step.accent,
-                    opacity: 0.6,
+                    opacity: 0.7,
                   }}
                 />
 
@@ -414,7 +559,7 @@ function HowItWorksSection() {
                     style={{
                       fontSize: "40px",
                       fontWeight: 900,
-                      color: `${step.accent}20`,
+                      color: `${step.accent}30`,
                       letterSpacing: "-0.04em",
                       lineHeight: 1,
                     }}
@@ -426,7 +571,7 @@ function HowItWorksSection() {
                   )}
                 </div>
 
-                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em" }}>{step.title}</h3>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "10px", letterSpacing: "-0.01em", color: "var(--text-primary)" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.7 }}>{step.desc}</p>
               </div>
             </div>
@@ -439,6 +584,8 @@ function HowItWorksSection() {
 
 function DemoSection() {
   const [selected, setSelected] = useState<Record<number, boolean>>({ 0: false, 1: true, 2: true, 3: true });
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const keptCount = Object.values(selected).filter(Boolean).length;
 
@@ -447,7 +594,7 @@ function DemoSection() {
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         <div style={{ marginBottom: "40px" }}>
           <p className="section-label" style={{ marginBottom: "14px" }}>Interactive preview</p>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "14px", lineHeight: 1.15 }}>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "14px", lineHeight: 1.15, color: "var(--text-primary)" }}>
             This is what the{" "}
             <span className="gradient-text">review step looks like</span>
           </h2>
@@ -457,9 +604,10 @@ function DemoSection() {
         </div>
 
         <div
+          className={isDark ? "" : "dash-card"}
           style={{
             borderRadius: "16px",
-            border: "1px solid var(--border-strong)",
+            border: isDark ? "1px solid var(--border-strong)" : undefined,
             background: "var(--bg-card)",
             overflow: "hidden",
           }}
@@ -472,11 +620,11 @@ function DemoSection() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              background: "var(--bg-secondary)",
+              background: isDark ? "var(--bg-secondary)" : "#f8faff",
             }}
           >
             <div>
-              <span style={{ fontWeight: 600, fontSize: "14px" }}>AI Preprocessing Plan</span>
+              <span style={{ fontWeight: 600, fontSize: "14px", color: "var(--text-primary)" }}>AI Preprocessing Plan</span>
               <span style={{ color: "var(--text-muted)", fontSize: "13px", marginLeft: "10px" }}>
                 customer_churn.csv
               </span>
@@ -524,7 +672,7 @@ function DemoSection() {
                     fontSize: "14px",
                     background: selected[i] ? "rgba(5,150,105,0.1)" : "rgba(225,29,72,0.08)",
                     transition: "all 0.18s ease",
-                    color: selected[i] ? "#6ee7b7" : "#fda4af",
+                    color: selected[i] ? (isDark ? "#6ee7b7" : "#059669") : (isDark ? "#fda4af" : "#e11d48"),
                     fontWeight: 600,
                   }}
                 >
@@ -533,7 +681,7 @@ function DemoSection() {
 
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "4px", flexWrap: "wrap" }}>
-                    <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 600, color: "#93c5fd" }}>
+                    <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 600, color: isDark ? "#93c5fd" : "#2563eb" }}>
                       {d.column}
                     </code>
                     <span className={`badge ${d.badge}`}>{d.action}</span>
@@ -557,7 +705,7 @@ function DemoSection() {
               borderTop: "1px solid var(--border)",
               fontSize: "12px",
               color: "var(--text-muted)",
-              background: "var(--bg-secondary)",
+              background: isDark ? "var(--bg-secondary)" : "#f8faff",
             }}
           >
             Click any toggle to approve or skip an action. Changes take effect only after you confirm.
@@ -569,6 +717,9 @@ function DemoSection() {
 }
 
 function CTASection() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <section
       style={{
@@ -576,10 +727,12 @@ function CTASection() {
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
-        background: "rgba(12,17,32,0.4)",
+        background: isDark ? "rgba(12,17,32,0.4)" : "linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%)",
       }}
     >
-      <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #1e3a8a, #2563eb)", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.15 }} />
+      {!isDark ? null : (
+        <div className="orb" style={{ width: 500, height: 500, background: "radial-gradient(circle, #1e3a8a, #2563eb)", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.15 }} />
+      )}
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: "580px", margin: "0 auto" }}>
         <p className="section-label" style={{ marginBottom: "20px" }}>Ready to start?</p>
@@ -590,6 +743,7 @@ function CTASection() {
             letterSpacing: "-0.04em",
             marginBottom: "20px",
             lineHeight: 1.1,
+            color: "var(--text-primary)",
           }}
         >
           Stop cleaning data{" "}
@@ -622,6 +776,7 @@ function Footer() {
         alignItems: "center",
         flexWrap: "wrap",
         gap: "16px",
+        background: "var(--bg-card)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -629,7 +784,7 @@ function Footer() {
           <rect width="22" height="22" rx="6" fill="#2563eb"/>
           <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <span style={{ fontWeight: 700, fontSize: "14px" }}>
+        <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>
           Forge<span style={{ color: "#60a5fa" }}>AI</span>
         </span>
         <span style={{ color: "var(--text-dimmed)", fontSize: "13px", marginLeft: "6px" }}>· AI Data Preprocessing</span>

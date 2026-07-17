@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, DragEvent } from "react";
 import Link from "next/link";
 import { SESSION_KEYS, downloadArtifact } from "@/lib/api";
 import type { UploadResponse, ColumnAnalysis } from "@/lib/api";
+import { DarkModeToggle, useTheme } from "@/lib/theme";
 
 type Stage = "idle" | "uploading" | "done" | "error";
 
@@ -115,15 +116,21 @@ export default function UploadPage() {
 
   const previewKeys  = profile?.preview?.length ? Object.keys(profile.preview[0]) : [];
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <main style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
       {/* Nav */}
       <nav
-        className="glass"
         style={{
-          padding: "0 36px", height: "56px",
+          padding: "0 36px", height: "58px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          borderBottom: "1px solid var(--border)", position: "sticky", top: 0, zIndex: 50,
+          background: isDark ? "rgba(8,12,20,0.92)" : "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "1px solid var(--border)",
+          position: "sticky", top: 0, zIndex: 50,
+          boxShadow: isDark ? "none" : "0 1px 8px rgba(0,0,40,0.07)",
         }}
       >
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
@@ -136,7 +143,8 @@ export default function UploadPage() {
           </span>
         </Link>
         <StepIndicator active={1} />
-        <div style={{ width: "110px" }} />
+        <DarkModeToggle />
+
       </nav>
 
       <div style={{ maxWidth: "900px", margin: "0 auto", padding: "52px 36px" }}>
@@ -158,7 +166,9 @@ export default function UploadPage() {
               style={{
                 borderRadius: "14px", padding: "72px 40px",
                 textAlign: "center", cursor: "pointer",
-                background: dragging ? "rgba(37,99,235,0.05)" : "rgba(15,21,36,0.6)",
+                background: dragging ? "rgba(37,99,235,0.05)" : (isDark ? "rgba(15,21,36,0.6)" : "rgba(255,255,255,0.7)"),
+                border: "1px dashed var(--border-strong)",
+                boxShadow: isDark ? "none" : "var(--shadow-card)",
               }}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
@@ -191,8 +201,10 @@ export default function UploadPage() {
               <div
                 style={{
                   marginTop: "16px", padding: "12px 18px", borderRadius: "9px",
-                  background: "rgba(225,29,72,0.08)", border: "1px solid rgba(225,29,72,0.25)",
-                  fontSize: "13px", color: "#fda4af",
+                  background: isDark ? "rgba(225,29,72,0.08)" : "rgba(225,29,72,0.05)",
+                  border: "1px solid rgba(225,29,72,0.25)",
+                  fontSize: "13px",
+                  color: isDark ? "#fda4af" : "#e11d48",
                 }}
               >
                 {errorMsg}
@@ -213,8 +225,8 @@ export default function UploadPage() {
                     key={name}
                     style={{
                       padding: "4px 11px", borderRadius: "6px",
-                      background: "rgba(255,255,255,0.04)", border: "1px solid var(--border-strong)",
-                      color: "var(--text-muted)", fontSize: "12px",
+                      background: "var(--toggle-bg)", border: "1px solid var(--border-strong)",
+                      color: "var(--text-secondary)", fontSize: "12px",
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
@@ -271,7 +283,7 @@ export default function UploadPage() {
               }}
             >
               <div>
-                <div style={{ fontWeight: 600, color: "#6ee7b7", marginBottom: "2px", fontSize: "14px" }}>
+                <div style={{ fontWeight: 600, color: isDark ? "#6ee7b7" : "#059669", marginBottom: "2px", fontSize: "14px" }}>
                   Analysis complete
                 </div>
                 <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
@@ -294,11 +306,12 @@ export default function UploadPage() {
               <div
                 style={{
                   padding: "13px 18px", borderRadius: "9px", marginBottom: "22px",
-                  background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.18)",
+                  background: isDark ? "rgba(124,58,237,0.06)" : "rgba(124,58,237,0.04)",
+                  border: "1px solid rgba(124,58,237,0.18)",
                   fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.65,
                 }}
               >
-                <strong style={{ color: "#c4b5fd", fontWeight: 600 }}>Gemma&apos;s first look: </strong>
+                <strong style={{ color: isDark ? "#c4b5fd" : "#7c3aed", fontWeight: 600 }}>Gemma&apos;s first look: </strong>
                 {profile.ai_summary}
               </div>
             )}
@@ -307,9 +320,10 @@ export default function UploadPage() {
             <div
               style={{
                 display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                gap: "1px", background: "var(--border-subtle)",
-                border: "1px solid var(--border-subtle)", borderRadius: "12px",
+                gap: "1px", background: "var(--border)",
+                border: "1px solid var(--border)", borderRadius: "12px",
                 overflow: "hidden", marginBottom: "24px",
+                boxShadow: isDark ? "none" : "var(--shadow-card)",
               }}
             >
               {profileStats.map((s) => (
@@ -324,15 +338,15 @@ export default function UploadPage() {
 
             {/* Data preview */}
             {profile.preview.length > 0 && (
-              <div style={{ borderRadius: "12px", border: "1px solid var(--border)", overflow: "hidden", marginBottom: "20px" }}>
+              <div style={{ borderRadius: "12px", border: "1px solid var(--border)", overflow: "hidden", marginBottom: "20px", boxShadow: isDark ? "none" : "var(--shadow-card)", background: "var(--bg-card)" }}>
                 <div
                   style={{
                     padding: "12px 18px", borderBottom: "1px solid var(--border)",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    background: "var(--bg-secondary)",
+                    background: isDark ? "var(--bg-secondary)" : "#f8faff",
                   }}
                 >
-                  <span style={{ fontWeight: 600, fontSize: "13px" }}>Data preview</span>
+                  <span style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>Data preview</span>
                   <span className="badge badge-blue">First 5 rows</span>
                 </div>
                 <div style={{ overflowX: "auto" }}>
@@ -360,9 +374,9 @@ export default function UploadPage() {
 
             {/* Column analysis */}
             {profile.column_analysis.length > 0 && (
-              <div style={{ borderRadius: "12px", border: "1px solid var(--border)", overflow: "hidden" }}>
-                <div style={{ padding: "12px 18px", borderBottom: "1px solid var(--border)", background: "var(--bg-secondary)" }}>
-                  <span style={{ fontWeight: 600, fontSize: "13px" }}>Column analysis</span>
+              <div style={{ borderRadius: "12px", border: "1px solid var(--border)", overflow: "hidden", boxShadow: isDark ? "none" : "var(--shadow-card)", background: "var(--bg-card)" }}>
+                <div style={{ padding: "12px 18px", borderBottom: "1px solid var(--border)", background: isDark ? "var(--bg-secondary)" : "#f8faff" }}>
+                  <span style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>Column analysis</span>
                 </div>
                 <div style={{ overflowX: "auto" }}>
                   <table className="data-table">
@@ -379,7 +393,7 @@ export default function UploadPage() {
                       {profile.column_analysis.map((col: ColumnAnalysis) => (
                         <tr key={col.name}>
                           <td>
-                            <code style={{ fontFamily: "'JetBrains Mono', monospace", color: "#93c5fd", fontSize: "13px" }}>
+                            <code style={{ fontFamily: "'JetBrains Mono', monospace", color: isDark ? "#93c5fd" : "#2563eb", fontSize: "13px" }}>
                               {col.name}
                             </code>
                           </td>
@@ -388,7 +402,7 @@ export default function UploadPage() {
                               {col.type}
                             </span>
                           </td>
-                          <td style={{ color: col.missing_pct > 0 ? "#fcd34d" : "#6ee7b7" }}>
+                          <td style={{ color: col.missing_pct > 0 ? (isDark ? "#fcd34d" : "#d97706") : (isDark ? "#6ee7b7" : "#059669"), fontWeight: 600 }}>
                             {col.missing_pct}%
                           </td>
                           <td>{col.unique_count.toLocaleString()}</td>
