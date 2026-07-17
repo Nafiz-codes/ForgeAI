@@ -21,7 +21,7 @@ DATASET_FILE = DATASETS_DIR / "titanic.csv"
 
 MODEL_PROVIDER = "gemma"
 
-MODEL_NAME = "gemma-4-26b-a4b-it"
+MODEL_NAME = "gemini-1.5-flash"
 
 TEMPERATURE = 0
 

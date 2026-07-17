@@ -1,0 +1,2 @@
+# This file ensures the sessions/ directory is committed to git.
+# Session files (CSV, JSON, HTML) are gitignored.

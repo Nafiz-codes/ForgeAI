@@ -44,6 +44,14 @@ class AIClient:
 
         return response.text
 
+    def analyze(self, prompt: str) -> str:
+        """
+        Public alias for _send_prompt.
+        Returns the raw model response text (no JSON parsing).
+        Called by backend_rial/ai_client.py.
+        """
+        return self._send_prompt(prompt)
+
     def generate(self, profile: dict) -> dict:
 
         prompt = self.prompt_builder.build_prompt(profile)
