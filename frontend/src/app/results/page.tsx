@@ -8,10 +8,10 @@ import { DarkModeToggle, useTheme } from "@/lib/theme";
 
 // ── Tab definitions ────────────────────────────────────────────────────────
 const TABS = [
-  { id: "overview",  label: "Overview" },
-  { id: "log",       label: "Decision log" },
-  { id: "pipeline",  label: "Pipeline code" },
-  { id: "models",    label: "Model suggestions" },
+  { id: "overview", label: "Overview" },
+  { id: "log", label: "Decision log" },
+  { id: "pipeline", label: "Pipeline code" },
+  { id: "models", label: "Model suggestions" },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -26,7 +26,7 @@ function StepIndicator({ active }: { active: 1 | 2 | 3 }) {
   return (
     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
       {steps.map((s, i) => {
-        const isDone   = s.num < active;
+        const isDone = s.num < active;
         const isActive = s.num === active;
         return (
           <div key={s.label} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -59,9 +59,9 @@ function StepIndicator({ active }: { active: 1 | 2 | 3 }) {
 
 // ── Health Ring SVG ────────────────────────────────────────────────────────
 function HealthRing({ score, label, color, isDark }: { score: number; label: string; color: string; isDark: boolean }) {
-  const r    = 44;
+  const r = 44;
   const circ = 2 * Math.PI * r;
-  const pct  = score / 100;
+  const pct = score / 100;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
       <div style={{ position: "relative", width: "110px", height: "110px" }}>
@@ -119,11 +119,11 @@ export default function ResultsPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [results,    setResults]    = useState<ExecuteResponse | null>(null);
-  const [activeTab,  setActiveTab]  = useState<TabId>("overview");
-  const [copied,     setCopied]     = useState(false);
-  const [dlError,    setDlError]    = useState("");
-  const [notFound,   setNotFound]   = useState(false);
+  const [results, setResults] = useState<ExecuteResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [copied, setCopied] = useState(false);
+  const [dlError, setDlError] = useState("");
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem(SESSION_KEYS.RESULTS);
@@ -146,7 +146,7 @@ export default function ResultsPage() {
     if (!results) return;
     setDlError("");
     try {
-      const base  = results.dataset_name.replace(".csv", "");
+      const base = results.dataset_name.replace(".csv", "");
       const fname = type === "csv" ? `${base}_clean.csv` : type === "pipeline" ? "pipeline.py" : "report.html";
       await downloadArtifact(results.job_id, type, fname);
     } catch (err: unknown) {
@@ -185,12 +185,12 @@ export default function ResultsPage() {
   if (!results) return null;
 
   const beforeAfterRows = [
-    { metric: "Rows",         before: results.rows_before.toLocaleString(),    after: results.rows_after.toLocaleString() },
-    { metric: "Columns",      before: String(results.columns_before),          after: String(results.columns_after) },
-    { metric: "Health score", before: String(results.health_score_before),     after: String(results.health_score_after) },
-    { metric: "Completeness", before: "—",                                      after: `${results.completeness_score}%` },
-    { metric: "Consistency",  before: "—",                                      after: `${results.consistency_score}%` },
-    { metric: "ML readiness", before: "—",                                      after: `${results.ml_readiness_score}%` },
+    { metric: "Rows", before: results.rows_before.toLocaleString(), after: results.rows_after.toLocaleString() },
+    { metric: "Columns", before: String(results.columns_before), after: String(results.columns_after) },
+    { metric: "Health score", before: String(results.health_score_before), after: String(results.health_score_after) },
+    { metric: "Completeness", before: "—", after: `${results.completeness_score}%` },
+    { metric: "Consistency", before: "—", after: `${results.consistency_score}%` },
+    { metric: "ML readiness", before: "—", after: `${results.ml_readiness_score}%` },
   ];
 
   const scoreDelta = results.health_score_after - results.health_score_before;
@@ -212,8 +212,8 @@ export default function ResultsPage() {
       >
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
           <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-            <rect width="22" height="22" rx="6" fill="#2563eb"/>
-            <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect width="22" height="22" rx="6" fill="#2563eb" />
+            <path d="M7 11.5L10 14.5L15 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span style={{ fontWeight: 700, fontSize: "15px", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
             Forge<span style={{ color: "#60a5fa" }}>AI</span>
@@ -343,9 +343,9 @@ export default function ResultsPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
             <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Quality Breakdown</div>
             <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center" }}>
-              <HealthRing score={results.completeness_score}  label="Completeness" color="#2563eb" isDark={isDark} />
-              <HealthRing score={results.consistency_score}   label="Consistency"  color="#7c3aed" isDark={isDark} />
-              <HealthRing score={results.ml_readiness_score}  label="ML readiness" color="#0ea5e9" isDark={isDark} />
+              <HealthRing score={results.completeness_score} label="Completeness" color="#2563eb" isDark={isDark} />
+              <HealthRing score={results.consistency_score} label="Consistency" color="#7c3aed" isDark={isDark} />
+              <HealthRing score={results.ml_readiness_score} label="ML readiness" color="#0ea5e9" isDark={isDark} />
             </div>
           </div>
         </div>
@@ -436,9 +436,9 @@ export default function ResultsPage() {
               </div>
               <div style={{ padding: "12px" }}>
                 {([
-                  { type: "csv"      as const, label: `${results.dataset_name.replace(".csv","")}_clean.csv`, desc: "ML-ready cleaned dataset", color: "#059669" },
-                  { type: "pipeline" as const, label: "preprocessing_pipeline.py",                            desc: "Reproducible Python pipeline", color: "#2563eb" },
-                  { type: "report"   as const, label: "ai_decision_report.html",                              desc: "Full AI audit trail (opens in tab)", color: "#7c3aed" },
+                  { type: "csv" as const, label: `${results.dataset_name.replace(".csv", "")}_clean.csv`, desc: "ML-ready cleaned dataset", color: "#059669" },
+                  { type: "pipeline" as const, label: "preprocessing_pipeline.py", desc: "Reproducible Python pipeline", color: "#2563eb" },
+                  { type: "report" as const, label: "ai_decision_report.html", desc: "Full AI audit trail (opens in tab)", color: "#7c3aed" },
                 ]).map((f) => (
                   <div
                     key={f.type}
@@ -460,9 +460,9 @@ export default function ResultsPage() {
                       }}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -472,7 +472,7 @@ export default function ResultsPage() {
                       <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{f.desc}</div>
                     </div>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round">
-                      <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                      <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                   </div>
                 ))}
@@ -593,12 +593,12 @@ export default function ResultsPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {results.ml_recommendations.map((m: MlRecommendation, rank: number) => {
               const modelColors: Record<string, string> = {
-                "Random Forest":       "#059669",
-                "XGBoost":             "#2563eb",
+                "Random Forest": "#059669",
+                "XGBoost": "#2563eb",
                 "Logistic Regression": "#7c3aed",
-                "Decision Tree":       "#d97706",
-                "SVM":                 "#0ea5e9",
-                "Neural Network":      "#ec4899",
+                "Decision Tree": "#d97706",
+                "SVM": "#0ea5e9",
+                "Neural Network": "#ec4899",
               };
               const color = modelColors[m.model] ?? "#2563eb";
               return (
