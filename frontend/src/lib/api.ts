@@ -112,16 +112,13 @@ export async function downloadArtifact(
     return;
   }
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Download failed: ${res.statusText}`);
-
-  const blob = await res.blob();
-  const objectUrl = URL.createObjectURL(blob);
+  // Direct anchor approach — avoids the revokeObjectURL race condition.
+  // FastAPI's FileResponse sends Content-Disposition: attachment, so the
+  // browser treats this as a file download rather than navigation.
   const a = document.createElement("a");
-  a.href = objectUrl;
-  a.download = filename ?? `${type === "csv" ? "clean.csv" : "pipeline.py"}`;
+  a.href = url;
+  a.download = filename ?? (type === "csv" ? "clean.csv" : "pipeline.py");
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(objectUrl);
 }
