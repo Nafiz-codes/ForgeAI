@@ -22,3 +22,6 @@ typing_extensions 4.16.0
 typing-inspection 0.4.2
 tzdata            2026.3
 uvicorn           0.51.0
+google-genai>=0.8.0
+aiofiles>=23.2.1
+openai>=1.30.0
