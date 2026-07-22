@@ -43,7 +43,24 @@ from session_store import (
     get_file_path,
     load_meta,
 )
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
+
+origins = [
+    "https://forge-9icy5fvmp-nafiz-codes-projects.vercel.app/",  # Replace with your Vercel domain
+    "http://localhost:3000/",                  # For local development
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Use [""] temporarily if you want to allow all origins
+    allow_credentials=True,
+    allow_methods=[""],
+    allow_headers=["*"],
+)
 # ─────────────────────────────────────────────────────────────
 # Bootstrap
 # ─────────────────────────────────────────────────────────────
