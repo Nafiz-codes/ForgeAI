@@ -5,7 +5,7 @@
 # 🚀 ForgeAI
 ### AI-Powered Dataset Preprocessing using **Gemma 4**
 
-![ForgeAI Banner](assets/thumbnail.png)
+![ForgeAI Banner](docs/ChatGPT Image Jul 22, 2026, 10_24_57 AM.png)
 
 ForgeAI is an intelligent dataset preprocessing platform that helps data scientists, students, researchers, and ML engineers clean datasets in minutes instead of hours.
 
