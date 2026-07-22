@@ -1,0 +1,22 @@
+# Ignore everything by default, then whitelist what's needed
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.env
+**/.venv
+**/venv
+**/*.egg-info
+
+# Backend-specific ignores
+backend_rial/sessions/*
+backend_rial/.env
+
+# Frontend — not needed in backend image
+frontend/
+frontend/.next/
+frontend/node_modules/
+
+# Test / docs
+test/
+docs/
+*.md
