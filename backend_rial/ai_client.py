@@ -30,7 +30,7 @@ from pathlib import Path
 # Add backend_ai to sys.path so we can import from backend_ai/ai/
 _BACKEND_AI_DIR = Path(__file__).resolve().parent.parent / "backend_ai"
 if str(_BACKEND_AI_DIR) not in sys.path:
-    sys.path.insert(0, str(_BACKEND_AI_DIR))
+    sys.path.append(str(_BACKEND_AI_DIR))
 
 from ai.client import AIClient
 
